@@ -1,0 +1,98 @@
+﻿@using ASOFOTEC.Dtos
+@model RegisterDto
+@{
+    ViewData["Title"] = "Crear Cuenta";
+    Layout = "_Layout";
+}
+
+<div class="auth-page">
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100 py-5">
+            <div class="col-lg-7 col-xl-6">
+
+                <div class="text-center mb-4">
+                    <h1 class="fw-bold text-success mb-2">ASOFOTEC</h1>
+                    <p class="text-muted">
+                        Únete a una comunidad que utiliza la tecnología para generar impacto social.
+                    </p>
+                </div>
+
+                <div class="card auth-card shadow-lg border-0">
+                    <div class="card-body p-4 p-md-5">
+
+                        <h3 class="text-center fw-bold mb-4">
+                            Crear una cuenta
+                        </h3>
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger">
+                        </div>
+
+                        <form asp-action="Register" method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Nombre" class="form-label">
+                                        Nombre
+                                    </label>
+                                    <input asp-for="Nombre"
+                                           class="form-control"
+                                           placeholder="Francis" />
+                                    <span asp-validation-for="Nombre"
+                                          class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Apellido" class="form-label">
+                                        Apellido
+                                    </label>
+                                    <input asp-for="Apellido"
+                                           class="form-control"
+                                           placeholder="Santana" />
+                                    <span asp-validation-for="Apellido"
+                                          class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Correo" class="form-label">Correo electrónico</label>
+                                <input asp-for="Correo" class="form-control" placeholder="correo@ejemplo.com" />
+                                <span asp-validation-for="Correo" class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Contraseña" class="form-label">Contraseña</label>
+                                <input asp-for="Contraseña" type="password" class="form-control" placeholder="Minimo 6 caracteres" />
+                                <span asp-validation-for="Contraseña" class="text-danger small"></span>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-success btn-lg w-100 mb-3">
+                                Crear Cuenta
+                            </button>
+
+                            <div class="text-center">
+                                <span class="text-muted">
+                                    ¿Ya tienes cuenta?
+                                </span>
+                                <a asp-action="Login"
+                                   class="text-success fw-semibold text-decoration-none">
+                                    Inicia sesión
+                                </a>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

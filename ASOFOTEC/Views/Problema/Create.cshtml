@@ -1,0 +1,44 @@
+﻿@using ASOFOTEC.Dtos
+@model ProblemaCreateDto
+
+<div class="card shadow p-4 border-0">
+    <h3 class="mb-4">Crear Problema</h3>
+
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+        <div class="mb-3">
+            <label asp-for="Imagen" class="form-label">Imagen:</label>
+            <input type="file" asp-for="Imagen" class="form-control" />
+            <span asp-validation-for="Imagen" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Titulo</label>
+            <input asp-for="Titulo" class="text-danger" />
+            <span asp-validation-for="Titulo" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea asp-for="Descripcion" class="form-control" ></textarea>
+            <span asp-validation-for="Descripcion" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Categoría</label>
+            <input asp-for="Categoria" class="form-control" />
+            <span asp-validation-for="Categoria" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Publicar Problema</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+
+
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

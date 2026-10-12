@@ -1,0 +1,236 @@
+﻿@model ASOFOTEC.Dtos.HomeDashboardDto
+
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<!-- HERO SECTION -->
+<section class="py-5 bg-light rounded-4 mb-5">
+    <div class="container">
+        <div class="row align-items-center g-4">
+
+            <!-- Texto -->
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Tecnología con propósito,
+                    <span class="text-success">impacto que transforma.</span>
+                </h1>
+
+                <p class="lead text-muted mb-4">
+                    En <strong>ASOFOTEC</strong> conectamos ideas, personas y tecnología
+                    para resolver problemas sociales y construir un futuro sostenible.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <a asp-controller="Problema"
+                       asp-action="Index"
+                       class="btn btn-success btn-lg px-4">
+                        Explorar Problemas
+                    </a>
+
+                    <a asp-controller="Auth"
+                       asp-action="Register"
+                       class="btn btn-outline-success btn-lg px-4">
+                        Registrarse
+                    </a>
+                </div>
+            </div>
+
+            <!-- Imagen -->
+            <div class="col-lg-6">
+                <img src="~/img/HERO/ASOFOTEC HERO.png"
+                     class="img-fluid rounded-4 shadow"
+                     alt="ASOFOTEC"
+                     onerror="this.style.display='none';" />
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- BENEFICIOS -->
+<section class="mb-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="fs-1 mb-3">👥</div>
+                    <h5 class="fw-bold">Conecta</h5>
+                    <p class="text-muted mb-0">
+                        Únete a una comunidad comprometida con el cambio.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="fs-1 mb-3">💡</div>
+                    <h5 class="fw-bold">Propón</h5>
+                    <p class="text-muted mb-0">
+                        Comparte soluciones para problemas reales.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="fs-1 mb-3">🤝</div>
+                    <h5 class="fw-bold">Colabora</h5>
+                    <p class="text-muted mb-0">
+                        Trabaja con otros para generar impacto.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <div class="fs-1 mb-3">📈</div>
+                    <h5 class="fw-bold">Transforma</h5>
+                    <p class="text-muted mb-0">
+                        Convierte ideas en acciones sostenibles.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- CONTENIDO PRINCIPAL -->
+<section class="mb-5">
+    <div class="container">
+        <div class="row g-4">
+
+            <!-- Problemas destacados -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                        <h4 class="text-success fw-bold mb-0">
+                            Problemas Destacados
+                        </h4>
+                        <a asp-controller="Problema"
+                           asp-action="Index"
+                           class="text-success text-decoration-none small fw-semibold">
+                            Ver todos
+                        </a>
+                    </div>
+
+                    <div class="card-body">
+                        @if (Model.ProblemasDestacados.Any())
+                        {
+                            @foreach (var problema in Model.ProblemasDestacados)
+                            {
+                                <div class="border-bottom pb-3 mb-3">
+                                    <h6 class="fw-bold mb-1">
+                                        @problema.Titulo
+                                    </h6>
+
+                                    <small class="text-success fw-semibold">
+                                        @problema.Categoria
+                                    </small>
+
+                                    <p class="text-muted small mt-2 mb-0">
+                                        @(problema.Descripcion.Length > 120
+                                            ? problema.Descripcion.Substring(0, 120) + "..."
+                                            : problema.Descripcion)
+                                    </p>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">
+                                No hay problemas registrados.
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Soluciones recientes -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                        <h4 class="text-warning fw-bold mb-0">
+                            Soluciones Recientes
+                        </h4>
+                    </div>
+
+                    <div class="card-body">
+                        @if (Model.SolucionesRecientes.Any())
+                        {
+                            @foreach (var solucion in Model.SolucionesRecientes)
+                            {
+                                <div class="border-bottom pb-3 mb-3">
+                                    <p class="mb-2">
+                                        @(solucion.Descripcion.Length > 150
+                                            ? solucion.Descripcion.Substring(0, 150) + "..."
+                                            : solucion.Descripcion)
+                                    </p>
+
+                                    <small class="text-muted">
+                                        @solucion.Fecha_Solucion.ToShortDateString()
+                                    </small>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0">
+                                No hay soluciones publicadas.
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ESTADÍSTICAS -->
+<section class="bg-success text-white rounded-4 py-5 mb-5">
+    <div class="container">
+        <div class="row text-center g-4">
+
+            <div class="col-md-4">
+                <h2 class="fw-bold display-6">@Model.TotalUsuarios+</h2>
+                <p class="mb-0">Miembros activos</p>
+            </div>
+
+            <div class="col-md-4">
+                <h2 class="fw-bold display-6">@Model.TotalProblemas+</h2>
+                <p class="mb-0">Problemas publicados</p>
+            </div>
+
+            <div class="col-md-4">
+                <h2 class="fw-bold display-6">@Model.TotalSoluciones+</h2>
+                <p class="mb-0">Soluciones propuestas</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- LLAMADO A LA ACCIÓN -->
+<section class="mb-5">
+    <div class="container">
+        <div class="card border-0 shadow-sm p-5 text-center bg-light">
+            <h3 class="fw-bold mb-3">Únete a ASOFOTEC</h3>
+
+            <p class="text-muted mb-4">
+                Sé parte del cambio. Tus ideas y conocimientos pueden ayudar
+                a transformar comunidades.
+            </p>
+
+            <div>
+                <a asp-controller="Auth"
+                   asp-action="Register"
+                   class="btn btn-success btn-lg px-4">
+                    Registrarse Ahora
+                </a>
+            </div>
+        </div>
+    </div>
+</section>

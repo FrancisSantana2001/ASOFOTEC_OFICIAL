@@ -1,0 +1,120 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+body {
+    background-color:#f4f6f9;
+}
+
+.card {
+    border-radius: 12px;
+    transition: all 0.2s ease-in-out;
+}
+
+ .card:hover 
+ {
+    transform: translateY(-4px);
+ }
+
+ .btn{
+     border-radius: 8px;
+ }
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.card{
+    border-radius:12px;
+}
+
+.btn {
+    border-radius: 8px;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card-img-top {
+    height: 180px;
+   object-fit:cover;
+}
+
+textarea {
+    border-radius: 10px;
+}
+
+.card {
+    border-radius: 14px;
+
+}
+
+.card-img-top {
+    height: 180px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.auth-page {
+    min-height: 100vh;
+    background: linear-gradient( 135deg, rgba(25, 135, 84, 0.08), rgba(255, 255, 255, 1) );
+}
+
+.auth-card {
+    border-radius: 1rem;
+}
+
+    .auth-card .card-body {
+        padding: 2.5rem;
+    }
+
+.form-control,
+.form-control-lg {
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid #dee2e6;
+}
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        border-color: #198754;
+    }
+
+.btn {
+    border-radius: 0.75rem;
+    font-weight: 600;
+}
+
+.text-success {
+    color: #198754 !important;
+}

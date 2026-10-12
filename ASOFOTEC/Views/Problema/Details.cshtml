@@ -1,0 +1,138 @@
+﻿@using ASOFOTEC.Dtos
+@model ProblemaDetailsDto
+
+
+
+<div class="container mt-5">
+    <!--Problema-->
+    <div class="card shadow-sm border-0 p-4 mb-4">
+        <span class="badge bg-success mb-2">
+            @Model.Problema.Categoria
+        </span>
+        <h2>@Model.Problema.Titulo</h2>
+        <p class="text-muted mt-3">
+            @Model.Problema.Descripcion
+        </p>
+        <small class="text-secondary">
+            Publicado el : @Model.Problema.Fecha_Creacion.ToShortDateString()
+        </small>
+         
+    </div>
+    <!--Formulario Para Solución-->
+    <div class="card shadow-sm border-0 p-4 mb-4">
+        <h5>Proponer una Solución</h5>
+        <form asp-action="CrearSolucion" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="NuevaSolucion.ProblemaId" />
+
+            <div class="mb-3">
+                <textarea asp-for="NuevaSolucion.Descripcion"
+                          class="form-control"
+                          rows="4"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Enviar Solución
+            </button>
+        </form>
+    </div>
+    <!--Listado de Soluciones-->
+    <div>
+        <h4 class="mb-3">Soluciones</h4>
+        @if (!Model.Soluciones.Any())
+        {
+            <div class="alert alert-info">
+                No hay soluciones! Puedes ser el primero en aportar.
+            </div>
+        }
+        else
+        {
+            @foreach (var solucion in Model.Soluciones)
+            {
+                <div class="card mb-3 shadow-sm border-0">
+                    <div class="card-body">
+                        <p>
+                          @solucion.Descripcion
+                        </p>
+                        <div class="d-flex justify-content-between">
+                            <span class="badge bg-secondary">
+                                @solucion.Estado
+                            </span>
+                            <small class="text-muted"
+                            >@solucion.Fecha_Solucion.ToShortDateString()</small>
+
+                            <div class="d-flex align-items-center gap-3 mt-3">
+                                <button class="btn-like btn btn-sm btn-outline-primary"
+                                        data-solucion-id="@solucion.Id">
+                                    👍 <span class="like-count">@solucion.TotalLikes</span>
+                                </button>
+                                <span class="text-muted">
+                                    💬 @solucion.TotalComentarios
+                                </span>
+                            </div>
+
+                            <hr />
+
+                            <div class="comentarios-container">
+
+                                <h6>
+                                    Comentarios
+                                    <span id="contador-@solucion.Id">
+                                        (@solucion.TotalComentarios)
+                                    </span>
+                                </h6>
+
+                                <form asp-controller="Comentario" asp-action="CrearComentario" method="post" class="mb-3">
+                                    <input type="hidden" name="SolucionId" value="@solucion.Id" />
+                                    <textarea name="Contenido" class="form-control" rows="2" maxlength="300" required
+                                              placeholder="Escribe un comentario..."></textarea>
+                                    <div class="text-end mt-2">
+                                        <button type="submit" class="btn btn-success">Comentar</button>
+                                    </div>
+                                </form>
+
+                                <div id="comentarios-@solucion.Id">
+                                    @foreach (var c in solucion.comentarios)
+                                    {
+                                        <div class="border-bottom py-2">
+                                            <strong>@c.UserName</strong>
+                                            <small class="text-muted">@c.FechaComentario.ToString("g")</small>
+                                            <p class="mb-0">@c.contenido</p>
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+
+                            <!-- BOTÓN ELIMINAR -->
+                            <form asp-controller="Solucion"
+                                  asp-action="Delete"
+                                  method="post"
+                                  onsubmit="return confirm('¿Deseas eliminar esta solución?');">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="id"
+                                       value="@solucion.Id" />
+
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger">
+                                    Eliminar
+                                </button>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+
+
+@{
+}

@@ -1,0 +1,31 @@
+﻿@using ASOFOTEC.Dtos
+@model List<SolucionDto>
+
+<div class="container mt-4">
+
+    <h3 class="mb-4">Soluciones</h3>
+    @foreach(var solution in Model)
+    {
+        <div class="card mb-3 shadow-sm border-0">
+            <div class="card-body">
+                <p>@solution.Descripcion</p>
+
+                <div class="d-flex justify-content-between">
+                    <span class="badge gb-secondary">@solution.Estado</span>
+                    <small>@solution.Fecha_Solucion.ToShortDateString()</small>
+                    <a class="btn btn-outline-danger btn-sm" asp-action="Delete" asp-route-id="@solution.Id">
+                        Eliminar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    }
+</div>
+
+
+
+
+
+@{
+}

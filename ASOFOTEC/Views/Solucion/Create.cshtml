@@ -1,0 +1,33 @@
+﻿@using ASOFOTEC.Dtos
+@model SolucionCreateDto
+
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 p-4">
+        <h3>Crea una solución</h3>
+        <small class="text-muted">Demuestra que puedes cambiar el mundo, con tus ideas podrás marcar la diferencia</small>
+
+        <form asp-action="Create" method="post">
+            <input type="hidden" asp-for="ProblemaId" value="7" />
+
+            <div class="mb-3">
+                <textarea asp-for="Descripcion"
+                class="form-control"
+                placeholder="Describe tu solución..."
+                rows="4"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+@{
+}
