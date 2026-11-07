@@ -1,0 +1,92 @@
+@using ASOFOTEC.Dtos
+@model ComentarioDto
+@{
+    // Un comentario (o una respuesta). Solo su autor ve el menú de editar / eliminar
+    var usuarioActualId = Context.ObtenerUsuarioId();
+    var autenticado = usuarioActualId.HasValue;
+    var esAutor = autenticado && usuarioActualId!.Value == Model.UsuarioId;
+    var esRespuesta = Model.ComentarioPadreId.HasValue;
+    var puedeEliminar = esAutor || Context.EsDba();
+    var avatar = AvatarVm.De(Model.UserName, Model.UserFoto, "comentario-avatar" + (esRespuesta ? " comentario-avatar-sm" : ""));
+}
+
+<div class="comentario-item d-flex gap-2 mb-2 @(esRespuesta ? "es-respuesta" : "")" data-comentario-id="@Model.id">
+    <partial name="_Avatar" model="avatar" />
+
+    <div class="flex-grow-1 comentario-cuerpo">
+        <!-- Vista normal -->
+        <div class="comentario-vista d-flex align-items-start gap-1">
+            <div class="comentario-burbuja">
+                <div class="fw-semibold small comentario-nombre">
+                    @if (autenticado)
+                    {
+                        <a asp-controller="Perfil" asp-action="@(esAutor ? "Index" : "Ver")" asp-route-id="@(esAutor ? null : (int?)Model.UsuarioId)"
+                           class="text-dark text-decoration-none">@Model.UserName</a>
+                    }
+                    else
+                    {
+                        @Model.UserName
+                    }
+                </div>
+                <div class="comentario-texto">@Model.contenido</div>
+            </div>
+
+            @if (puedeEliminar)
+            {
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light rounded-circle comentario-menu-btn"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            data-bs-popper-config='{"strategy":"fixed"}'
+                            aria-expanded="false"
+                            aria-label="Opciones del comentario">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        @if (esAutor)
+                        {
+                            <li>
+                                <button type="button" class="dropdown-item btn-editar-comentario">
+                                    <i class="bi bi-pencil me-2"></i>Editar
+                                </button>
+                            </li>
+                        }
+                        <li>
+                            <button type="button" class="dropdown-item text-danger btn-eliminar-comentario">
+                                <i class="bi bi-trash me-2"></i>Eliminar
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            }
+        </div>
+
+        <!-- Vista de edición (solo existe para el autor) -->
+        @if (esAutor)
+        {
+            <div class="comentario-edicion d-none">
+                <textarea class="form-control form-control-sm" rows="2" maxlength="300"></textarea>
+                <div class="mt-1 d-flex gap-2 justify-content-end">
+                    <button type="button" class="btn btn-sm btn-light btn-cancelar-edicion">Cancelar</button>
+                    <button type="button" class="btn btn-sm btn-success btn-guardar-edicion">Guardar</button>
+                </div>
+            </div>
+        }
+
+        <!-- Acciones: me gusta, responder, fecha y contador de likes -->
+        <div class="comentario-acciones d-flex align-items-center gap-3 ms-2">
+            @if (autenticado)
+            {
+                <button type="button"
+                        class="btn btn-link p-0 comentario-accion btn-like-comentario @(Model.UsuarioDioLike ? "fw-bold text-success" : "text-muted")"
+                        data-comentario-id="@Model.id">Me gusta</button>
+                <button type="button" class="btn btn-link p-0 comentario-accion text-muted btn-responder-comentario">Responder</button>
+            }
+            <span class="comentario-accion text-muted comentario-fecha">@FeedHelper.TiempoRelativo(Model.FechaComentario)</span>
+            <span class="comentario-accion text-muted likes-comentario @(Model.TotalLikes == 0 ? "d-none" : "")">
+                <i class="bi bi-hand-thumbs-up-fill text-success"></i>
+                <span class="contador-like-com">@Model.TotalLikes</span>
+            </span>
+        </div>
+    </div>
+</div>

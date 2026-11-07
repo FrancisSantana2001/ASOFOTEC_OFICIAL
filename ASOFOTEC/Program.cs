@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using ASOFOTEC.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,11 +17,24 @@ builder.Services.AddDbContext<AppDbContext>(Op => Op.UseSqlServer(ConnetionStrin
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Chat en tiempo real
+builder.Services.AddSignalR();
 builder.Services.AddScoped<IProblemaService, ProblemaService>();
 builder.Services.AddScoped<IsolucionService, SolucionService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IComentarioService, ComentarioService>();
 builder.Services.AddScoped<ILikeService, LikeService>();
+builder.Services.AddScoped<IPublicacionService, PublicacionService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
+builder.Services.AddScoped<IRutaProblemaService, RutaProblemaService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<INotificacionService, NotificacionService>();
+builder.Services.AddScoped<ISeguimientoService, SeguimientoService>();
+builder.Services.AddScoped<IPerfilService, PerfilService>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IBloqueoService, BloqueoService>();
+builder.Services.AddScoped<IFeedService, FeedService>();
 
 //Agregar servicios de autenticacion JWT
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -48,7 +63,77 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnMessageReceived = context =>
             {
+                // Archivos estáticos (css, js, imágenes, fotos subidas): no hace falta validar el token
+                if (Path.HasExtension(context.Request.Path))
+                {
+                    return Task.CompletedTask;
+                }
+
                 context.Token = context.Request.Cookies["Jwt"];
+                return Task.CompletedTask;
+            },
+
+            // Un token firmado no basta: la cuenta debe seguir existiendo y estar activa.
+            // Así, desactivar a un usuario corta su acceso de inmediato.
+            OnTokenValidated = async context =>
+            {
+                var valor = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!int.TryParse(valor, out var usuarioId))
+                {
+                    context.Fail("Token sin usuario.");
+                    return;
+                }
+
+                var db = context.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+                var activo = await db.usuarios
+                    .AsNoTracking()
+                    .Where(u => u.Id == usuarioId)
+                    .Select(u => (bool?)u.Activo)
+                    .FirstOrDefaultAsync();
+
+                if (activo != true)
+                {
+                    context.Fail("Usuario inexistente o desactivado.");
+                }
+            },
+
+            // Usuario sin sesión intentando usar una acción protegida:
+            // - peticiones AJAX (fetch) -> 401 para que el JS redirija al login
+            // - navegación normal       -> redirige a la pantalla de login
+            OnChallenge = context =>
+            {
+                context.HandleResponse();
+
+                if (context.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                }
+                else
+                {
+                    // Se recuerda la página a la que quería entrar para volver ahí tras iniciar sesión.
+                    // Si era un POST (no se puede repetir con un GET) se usa la página de origen.
+                    var request = context.Request;
+                    var destino = "/";
+
+                    if (HttpMethods.IsGet(request.Method))
+                    {
+                        destino = request.Path + request.QueryString;
+                    }
+                    else if (Uri.TryCreate(request.Headers.Referer.ToString(), UriKind.Absolute, out var origen)
+                             && string.Equals(origen.Host, request.Host.Host, StringComparison.OrdinalIgnoreCase))
+                    {
+                        destino = origen.PathAndQuery;
+                    }
+
+                    context.Response.Redirect("/Auth/Login?returnUrl=" + Uri.EscapeDataString(destino));
+                }
+                return Task.CompletedTask;
+            },
+
+            // Autenticado pero sin permiso
+            OnForbidden = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
                 return Task.CompletedTask;
             }
         };
@@ -69,6 +154,9 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+// Garantiza los roles y el administrador DBA (si está configurado)
+await ASOFOTEC.Data.DbInicializador.AsegurarRolesYDbaAsync(app.Services);
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -78,6 +166,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Sirve los archivos que se suben mientras la aplicación está en ejecución (fotos y videos)
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseSession();
@@ -87,6 +179,9 @@ app.UseAuthorization();
 
 
 app.MapStaticAssets();
+
+// Punto de conexión del chat (requiere sesión iniciada)
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.MapControllerRoute(
     name: "default",

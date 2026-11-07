@@ -1,0 +1,56 @@
+{
+  "name": "@3xpo/svelte-bootstrap-ico",
+  "version": "0.1.5",
+  "description": "Bootstrap Icons Font-style Wrapper",
+  "author": "Exponential Workload",
+  "repository": {
+    "type": "git",
+    "url": "https://codeberg.org/Expo/svelte-bi.git"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
+  ],
+  "peerDependencies": {
+    "svelte": "^4.0.0 || ^5.0.0"
+  },
+  "optionalDependencies": {
+    "bootstrap-icons": "^1.11.3"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.1",
+    "@sveltejs/kit": "^2.5.2",
+    "@sveltejs/package": "^2.2.7",
+    "@sveltejs/vite-plugin-svelte": "^3.0.2",
+    "prettier": "^3.2.5",
+    "prettier-plugin-svelte": "^3.2.2",
+    "publint": "^0.2.7",
+    "sass": "^1.71.1",
+    "svelte": "^4.2.12",
+    "svelte-check": "^3.6.6",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.5"
+  },
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build && npm run package",
+    "preview": "vite preview",
+    "package": "svelte-kit sync && svelte-package && publint",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "build-icon-list": "node src/lib/_generate.mjs"
+  }
+}

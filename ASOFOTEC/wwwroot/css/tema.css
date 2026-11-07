@@ -1,0 +1,410 @@
+/* =====================================================================
+   ASOFOTEC - TEMA: paleta única, colores con significado y modo oscuro
+   ---------------------------------------------------------------------
+   Todo el sitio toma sus colores de estas variables. Para cambiar un color
+   de la marca basta con editarlo aquí.
+
+   Marca (sacada del logo y del boceto):
+     verde principal #216c45 · turquesa oscuro #0d4546 · lima #7cb518
+   El modo oscuro se activa con data-bs-theme="dark" en <html> (botón del navbar).
+   ===================================================================== */
+
+/* ----------------------------------------------------------------------
+   1. PALETA - modo claro
+   ---------------------------------------------------------------------- */
+:root,
+[data-bs-theme="light"] {
+    /* Marca */
+    --as-verde: #216c45;              /* botones, rellenos */
+    --as-verde-rgb: 33, 108, 69;
+    --as-verde-osc: #195636;          /* hover / presionado */
+    --as-verde-claro: #e8f2ec;        /* fondos suaves */
+    --as-verde-texto: #216c45;        /* texto y bordes verdes sobre la superficie */
+    --as-teal: #0d4546;               /* barra de estadísticas y títulos fuertes */
+    --as-lima: #7cb518;               /* acento (degradado del logo) */
+
+    /* Neutros cálidos */
+    --as-fondo: #f6f7f4;              /* fondo de la página */
+    --as-superficie: #ffffff;         /* tarjetas, menús, formularios */
+    --as-superficie-2: #f2f4f1;       /* rellenos suaves: hover, burbujas, avisos */
+    --as-borde: #e3e7e2;
+    --as-texto: #1f2d28;
+    --as-texto-suave: #5a6962;
+    --as-titulo: #15513a;
+    --as-sombra: rgba(16, 40, 30, 0.07);
+
+    /* Tintes de las tarjetas de la portada */
+    --as-tinte-problemas: #f2f8f4;
+    --as-tinte-soluciones: #fdf8f1;
+    --as-tinte-unete: #ebf3f6;
+    --as-calido-bg: #f1ede2;
+    --as-calido-fg: #b58a1e;
+    --as-calido-titulo: #6b4e16;
+
+    /* Chat */
+    --as-burbuja-mio: #d9f2e3;
+
+    /* Estados con significado fijo */
+    --as-exito: #287d50;
+    --as-exito-rgb: 40, 125, 80;
+    --as-alerta: #e0a01a;
+    --as-alerta-rgb: 224, 160, 26;
+    --as-peligro: #c8403d;
+    --as-peligro-rgb: 200, 64, 61;
+    --as-info: #237a89;
+    --as-info-rgb: 35, 122, 137;
+    --as-seguidor: #7a58a8;           /* aviso de "te siguió" */
+
+    /* Ruta del problema: un color por paso (relleno y variante para texto) */
+    --as-ruta-1: #66767f;  --as-ruta-1-t: #55646c;   /* Publicado */
+    --as-ruta-2: #237a89;  --as-ruta-2-t: #1d6877;   /* Documentado */
+    --as-ruta-3: #4a7f0b;  --as-ruta-3-t: #3f6e09;   /* Recibiendo soluciones */
+    --as-ruta-4: #e0a01a;  --as-ruta-4-t: #8a5a00;   /* Comparando propuestas */
+    --as-ruta-5: #3b6fb6;  --as-ruta-5-t: #2f5c9c;   /* Formando equipo */
+    --as-ruta-6: #216c45;  --as-ruta-6-t: #216c45;   /* En ejecución */
+    --as-ruta-7: #0d4546;  --as-ruta-7-t: #0d4546;   /* Resuelto */
+
+    /* Alias antiguos (por compatibilidad con estilos existentes) */
+    --as-tinta: var(--as-texto);
+
+    /* ---- Variables de Bootstrap: todo lo "primario" pasa a verde ---- */
+    --bs-primary: var(--as-verde);
+    --bs-primary-rgb: var(--as-verde-rgb);
+    --bs-success: var(--as-exito);
+    --bs-success-rgb: var(--as-exito-rgb);
+    --bs-warning: var(--as-alerta);
+    --bs-warning-rgb: var(--as-alerta-rgb);
+    --bs-danger: var(--as-peligro);
+    --bs-danger-rgb: var(--as-peligro-rgb);
+    --bs-info: var(--as-info);
+    --bs-info-rgb: var(--as-info-rgb);
+    --bs-secondary: #66746d;
+    --bs-secondary-rgb: 102, 116, 109;
+
+    --bs-body-color: var(--as-texto);
+    --bs-body-bg: var(--as-superficie);
+    --bs-secondary-color: var(--as-texto-suave);
+    --bs-tertiary-bg: var(--as-superficie-2);
+    --bs-border-color: var(--as-borde);
+    --bs-link-color: var(--as-verde-texto);
+    --bs-link-color-rgb: 33, 108, 69;
+    --bs-link-hover-color: var(--as-verde-osc);
+    --bs-link-hover-color-rgb: 25, 86, 54;
+    --bs-focus-ring-color: rgba(33, 108, 69, 0.28);
+}
+
+/* ----------------------------------------------------------------------
+   2. PALETA - modo oscuro
+   ---------------------------------------------------------------------- */
+[data-bs-theme="dark"] {
+    color-scheme: dark;
+
+    --as-verde: #2a8458;
+    --as-verde-rgb: 42, 132, 88;
+    --as-verde-osc: #236e49;
+    --as-verde-claro: #1c3a2c;
+    --as-verde-texto: #6fd09a;
+    --as-teal: #0f5254;
+    --as-lima: #8fcb2a;
+
+    --as-fondo: #0f1513;
+    --as-superficie: #19211e;
+    --as-superficie-2: #222c28;
+    --as-borde: #2d3a35;
+    --as-texto: #e6ece8;
+    --as-texto-suave: #9fb2a8;
+    --as-titulo: #cfe9db;
+    --as-sombra: rgba(0, 0, 0, 0.45);
+
+    --as-tinte-problemas: #18251f;
+    --as-tinte-soluciones: #292319;
+    --as-tinte-unete: #17262b;
+    --as-calido-bg: #3a3220;
+    --as-calido-fg: #e2bd5c;
+    --as-calido-titulo: #e7cf9a;
+
+    --as-burbuja-mio: #1d4d37;
+
+    --as-exito: #2f9461;
+    --as-exito-rgb: 47, 148, 97;
+    --as-alerta: #e8b13d;
+    --as-alerta-rgb: 232, 177, 61;
+    --as-peligro: #d9524f;
+    --as-peligro-rgb: 217, 82, 79;
+    --as-info: #2d93a5;
+    --as-info-rgb: 45, 147, 165;
+    --as-seguidor: #a58bd4;
+
+    --as-ruta-1: #55646c;  --as-ruta-1-t: #a9b8c0;
+    --as-ruta-2: #1d6877;  --as-ruta-2-t: #5fc3d4;
+    --as-ruta-3: #4a7f0b;  --as-ruta-3-t: #9bd24a;
+    --as-ruta-4: #e0a01a;  --as-ruta-4-t: #f0bf5a;
+    --as-ruta-5: #3b6fb6;  --as-ruta-5-t: #7fa9e6;
+    --as-ruta-6: #2a8458;  --as-ruta-6-t: #6fd09a;
+    --as-ruta-7: #0f5254;  --as-ruta-7-t: #6cc9c9;
+
+    --bs-secondary: #5d6c65;
+    --bs-secondary-rgb: 93, 108, 101;
+
+    --bs-body-color: var(--as-texto);
+    --bs-body-bg: var(--as-superficie);
+    --bs-secondary-color: var(--as-texto-suave);
+    --bs-tertiary-bg: var(--as-superficie-2);
+    --bs-border-color: var(--as-borde);
+    --bs-link-color: var(--as-verde-texto);
+    --bs-link-color-rgb: 111, 208, 154;
+    --bs-link-hover-color: #93e0b5;
+    --bs-link-hover-color-rgb: 147, 224, 181;
+    --bs-focus-ring-color: rgba(111, 208, 154, 0.3);
+
+    --bs-box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.5);
+}
+
+body {
+    background-color: var(--as-fondo);
+    color: var(--as-texto);
+}
+
+/* ----------------------------------------------------------------------
+   3. BOOTSTRAP: lo que traía azul fijo pasa a la paleta de la marca
+   ---------------------------------------------------------------------- */
+.btn-primary,
+.btn-success {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--as-verde);
+    --bs-btn-border-color: var(--as-verde);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--as-verde-osc);
+    --bs-btn-hover-border-color: var(--as-verde-osc);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--as-verde-osc);
+    --bs-btn-active-border-color: var(--as-verde-osc);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: var(--as-verde);
+    --bs-btn-disabled-border-color: var(--as-verde);
+    --bs-btn-focus-shadow-rgb: var(--as-verde-rgb);
+}
+
+.btn-outline-primary,
+.btn-outline-success {
+    --bs-btn-color: var(--as-verde-texto);
+    --bs-btn-border-color: var(--as-verde);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--as-verde);
+    --bs-btn-hover-border-color: var(--as-verde);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--as-verde);
+    --bs-btn-active-border-color: var(--as-verde);
+    --bs-btn-disabled-color: var(--as-verde-texto);
+    --bs-btn-disabled-border-color: var(--as-verde);
+    --bs-btn-focus-shadow-rgb: var(--as-verde-rgb);
+}
+
+.btn-danger {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--as-peligro);
+    --bs-btn-border-color: var(--as-peligro);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #a93431;
+    --bs-btn-hover-border-color: #a93431;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #a93431;
+    --bs-btn-active-border-color: #a93431;
+    --bs-btn-focus-shadow-rgb: var(--as-peligro-rgb);
+}
+
+.btn-outline-danger {
+    --bs-btn-color: var(--as-peligro);
+    --bs-btn-border-color: var(--as-peligro);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--as-peligro);
+    --bs-btn-hover-border-color: var(--as-peligro);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--as-peligro);
+    --bs-btn-active-border-color: var(--as-peligro);
+    --bs-btn-focus-shadow-rgb: var(--as-peligro-rgb);
+}
+
+.btn-outline-secondary {
+    --bs-btn-color: var(--as-texto-suave);
+    --bs-btn-border-color: var(--as-borde);
+    --bs-btn-hover-color: var(--as-texto);
+    --bs-btn-hover-bg: var(--as-superficie-2);
+    --bs-btn-hover-border-color: var(--as-borde);
+    --bs-btn-active-color: var(--as-texto);
+    --bs-btn-active-bg: var(--as-superficie-2);
+    --bs-btn-active-border-color: var(--as-borde);
+    --bs-btn-disabled-color: var(--as-texto-suave);
+    --bs-btn-disabled-border-color: var(--as-borde);
+}
+
+/* Valores que Bootstrap deja escritos en azul dentro de cada componente */
+.nav-pills {
+    --bs-nav-pills-link-active-bg: var(--as-verde);
+    --bs-nav-pills-link-active-color: #fff;
+}
+
+.dropdown-menu {
+    --bs-dropdown-link-active-bg: var(--as-verde);
+    --bs-dropdown-link-active-color: #fff;
+}
+
+.list-group {
+    --bs-list-group-active-bg: var(--as-verde);
+    --bs-list-group-active-border-color: var(--as-verde);
+}
+
+.progress {
+    --bs-progress-bar-bg: var(--as-verde);
+}
+
+.form-check-input:checked,
+.form-check-input[type="checkbox"]:indeterminate {
+    background-color: var(--as-verde);
+    border-color: var(--as-verde);
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--as-verde);
+    box-shadow: 0 0 0 0.2rem rgba(var(--as-verde-rgb), 0.25);
+}
+
+/* Foco visible para quien navega con teclado */
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible,
+.btn:focus-visible {
+    outline: 2px solid var(--as-verde-texto);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+.text-primary,
+.text-success {
+    color: var(--as-verde-texto) !important;
+}
+
+.text-danger {
+    color: var(--as-peligro) !important;
+}
+
+/* ----------------------------------------------------------------------
+   4. RUTA DEL PROBLEMA: un color fijo por estado
+   ---------------------------------------------------------------------- */
+.bg-ruta-1 { background-color: var(--as-ruta-1) !important; }
+.bg-ruta-2 { background-color: var(--as-ruta-2) !important; }
+.bg-ruta-3 { background-color: var(--as-ruta-3) !important; }
+.bg-ruta-4 { background-color: var(--as-ruta-4) !important; }
+.bg-ruta-5 { background-color: var(--as-ruta-5) !important; }
+.bg-ruta-6 { background-color: var(--as-ruta-6) !important; }
+.bg-ruta-7 { background-color: var(--as-ruta-7) !important; }
+
+.text-bg-ruta-1, .text-bg-ruta-2, .text-bg-ruta-3,
+.text-bg-ruta-5, .text-bg-ruta-6, .text-bg-ruta-7 { color: #fff !important; }
+.text-bg-ruta-4 { color: #2b1f00 !important; }   /* texto oscuro sobre ámbar */
+
+.text-bg-ruta-1 { background-color: var(--as-ruta-1) !important; }
+.text-bg-ruta-2 { background-color: var(--as-ruta-2) !important; }
+.text-bg-ruta-3 { background-color: var(--as-ruta-3) !important; }
+.text-bg-ruta-4 { background-color: var(--as-ruta-4) !important; }
+.text-bg-ruta-5 { background-color: var(--as-ruta-5) !important; }
+.text-bg-ruta-6 { background-color: var(--as-ruta-6) !important; }
+.text-bg-ruta-7 { background-color: var(--as-ruta-7) !important; }
+
+.text-ruta-1 { color: var(--as-ruta-1-t) !important; }
+.text-ruta-2 { color: var(--as-ruta-2-t) !important; }
+.text-ruta-3 { color: var(--as-ruta-3-t) !important; }
+.text-ruta-4 { color: var(--as-ruta-4-t) !important; }
+.text-ruta-5 { color: var(--as-ruta-5-t) !important; }
+.text-ruta-6 { color: var(--as-ruta-6-t) !important; }
+.text-ruta-7 { color: var(--as-ruta-7-t) !important; }
+
+/* ----------------------------------------------------------------------
+   5. AVATARES: cada persona tiene su color (según su nombre)
+   ---------------------------------------------------------------------- */
+.avatar-c0 { background-color: #216c45; }
+.avatar-c1 { background-color: #0d6f73; }
+.avatar-c2 { background-color: #2f6f9f; }
+.avatar-c3 { background-color: #5b6fb0; }
+.avatar-c4 { background-color: #7a58a8; }
+.avatar-c5 { background-color: #a2506d; }
+.avatar-c6 { background-color: #b0652a; }
+.avatar-c7 { background-color: #6b7f1c; }
+
+[class*="avatar-c"] {
+    color: #fff;
+}
+
+/* ----------------------------------------------------------------------
+   6. MODO OSCURO: utilidades de Bootstrap que traen colores fijos
+   ---------------------------------------------------------------------- */
+[data-bs-theme="dark"] .text-dark {
+    color: var(--as-texto) !important;
+}
+
+[data-bs-theme="dark"] .bg-white {
+    background-color: var(--as-superficie) !important;
+}
+
+[data-bs-theme="dark"] .bg-light,
+[data-bs-theme="dark"] .text-bg-light {
+    background-color: var(--as-superficie-2) !important;
+    color: var(--as-texto) !important;
+}
+
+[data-bs-theme="dark"] .btn-light {
+    --bs-btn-color: var(--as-texto);
+    --bs-btn-bg: var(--as-superficie-2);
+    --bs-btn-border-color: var(--as-borde);
+    --bs-btn-hover-color: var(--as-texto);
+    --bs-btn-hover-bg: var(--as-borde);
+    --bs-btn-hover-border-color: var(--as-borde);
+    --bs-btn-active-color: var(--as-texto);
+    --bs-btn-active-bg: var(--as-borde);
+    --bs-btn-active-border-color: var(--as-borde);
+    --bs-btn-disabled-color: var(--as-texto-suave);
+    --bs-btn-disabled-bg: var(--as-superficie-2);
+}
+
+[data-bs-theme="dark"] .text-bg-dark {
+    background-color: var(--as-teal) !important;
+    color: #fff !important;
+}
+
+[data-bs-theme="dark"] .navbar-toggler-icon {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-bs-theme="dark"] .as-hero-imagen img {
+    filter: brightness(0.82) contrast(1.05);
+}
+
+/* Botón del navbar para cambiar de tema */
+.btn-tema {
+    background: none;
+    border: 0;
+    color: var(--as-texto);
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0.4rem 0.6rem;
+    border-radius: 50%;
+}
+
+.btn-tema:hover {
+    background: var(--as-superficie-2);
+    color: var(--as-verde-texto);
+}
+
+/* Si la persona pidió menos animaciones en su sistema, se respetan */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

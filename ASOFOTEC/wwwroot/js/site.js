@@ -16,7 +16,7 @@ document.querySelectorAll(".btn-like")
             });
 
             if (response.status === 401) {
-                window.location.href = '/Auth/Login';
+                Ux.irALogin();
                 return;
             }
 
@@ -26,12 +26,14 @@ document.querySelectorAll(".btn-like")
                 // ✅ camelCase correcto + selector con punto
                 this.querySelector(".like-count").innerText = data.totalLikes;
 
-                if (data.liked) {
-                    this.classList.remove("btn-outline-primary");
-                    this.classList.add("btn-primary");
-                } else {
-                    this.classList.remove("btn-primary");
-                    this.classList.add("btn-outline-primary");
+                // Botón verde: contorno cuando no has dado like, relleno cuando sí
+                this.classList.toggle("btn-success", data.liked);
+                this.classList.toggle("btn-outline-success", !data.liked);
+
+                const icono = this.querySelector("i");
+                if (icono) {
+                    icono.classList.toggle("bi-hand-thumbs-up-fill", data.liked);
+                    icono.classList.toggle("bi-hand-thumbs-up", !data.liked);
                 }
             }
         });

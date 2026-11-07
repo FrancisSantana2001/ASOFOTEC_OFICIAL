@@ -1,0 +1,69 @@
+@{
+    ViewData["Title"] = "Sobre Nosotros";
+    var autenticado = Context.ObtenerUsuarioId().HasValue;
+}
+
+<div class="mt-2">
+    <h1 class="h2 as-pagina-titulo">Sobre ASOFOTEC</h1>
+    <p class="lead text-muted mb-4">
+        Asociación Sostenible para Fomentar la Tecnología: una plataforma donde conectamos ideas,
+        personas y tecnología para resolver problemas sociales y construir un futuro sostenible.
+    </p>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="as-tarjeta-simple">
+                <h2 class="h5 as-pagina-titulo"><i class="bi bi-bullseye text-success me-2"></i>Qué buscamos</h2>
+                <p class="mb-0">
+                    Que cualquier persona pueda publicar un problema de su comunidad y que otras
+                    personas propongan, comparen y ejecuten soluciones, con resultados que quedan documentados.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="as-tarjeta-simple">
+                <h2 class="h5 as-pagina-titulo"><i class="bi bi-stars text-success me-2"></i>Qué nos diferencia</h2>
+                <p class="mb-0">
+                    No es solo una red social: cada problema recorre una ruta clara, desde su descripción
+                    hasta los resultados, para que las buenas ideas se conviertan en acciones.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="h4 as-pagina-titulo mb-3">Así funciona la ruta de un problema</h2>
+    <div class="row g-3 mb-4">
+        @{
+            var pasos = new (string Titulo, string Texto)[]
+            {
+                ("Describir el problema", "Quien lo vive lo explica con sus palabras y, si quiere, con una imagen."),
+                ("Documentar causas y consecuencias", "Se analiza por qué ocurre y a quiénes afecta."),
+                ("Proponer soluciones", "Cualquier miembro propone una o varias soluciones."),
+                ("Comparar las propuestas", "Se ven lado a lado: impacto, costo, tiempo y apoyo de la comunidad."),
+                ("Formar un equipo", "Quienes quieren ayudar se suman a la solución elegida."),
+                ("Registrar los avances", "El equipo cuenta cómo va el trabajo, paso a paso."),
+                ("Documentar los resultados", "Al terminar queda registrado lo que se logró.")
+            };
+        }
+        @for (var i = 0; i < pasos.Length; i++)
+        {
+            <div class="col-12 col-md-6">
+                <div class="as-tarjeta-simple d-flex gap-3">
+                    <div class="as-paso-num">@(i + 1)</div>
+                    <div>
+                        <div class="fw-semibold">@pasos[i].Titulo</div>
+                        <div class="small text-muted">@pasos[i].Texto</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="Problema" asp-action="Index" class="btn btn-as">Explorar problemas</a>
+        @if (!autenticado)
+        {
+            <a asp-controller="Auth" asp-action="Register" class="btn btn-as-outline">Crear mi cuenta</a>
+        }
+    </div>
+</div>

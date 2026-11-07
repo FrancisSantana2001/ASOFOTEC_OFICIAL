@@ -1,0 +1,43 @@
+@using ASOFOTEC.Dtos
+@model FeedItemDto
+
+@{
+    ViewData["Title"] = "Publicación de " + Model.UsuarioNombre;
+    var autenticado = Context.ObtenerUsuarioId().HasValue;
+
+    // Vista previa al compartir el enlace (WhatsApp, Facebook...)
+    var enlace = Url.Action("Ver", "Publicacion", new { id = Model.Id }, Context.Request.Scheme);
+    var resumen = FeedHelper.Resumir(Model.Contenido, 160);
+    ViewData["OgTitulo"] = $"{Model.UsuarioNombre} en ASOFOTEC";
+    ViewData["OgDescripcion"] = string.IsNullOrWhiteSpace(resumen) ? "Mira esta publicación en ASOFOTEC." : resumen;
+    ViewData["OgUrl"] = enlace;
+    if (Model.MediaTipo == "imagen" && !string.IsNullOrEmpty(Model.MediaUrl))
+    {
+        ViewData["OgImagen"] = $"{Context.Request.Scheme}://{Context.Request.Host}{Model.MediaUrl}";
+    }
+
+    // En esta página los comentarios aparecen abiertos
+    ViewData["PanelAbierto"] = true;
+}
+
+<div class="mx-auto mt-2" style="max-width:680px">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-link text-decoration-none ps-0 mb-2">
+        <i class="bi bi-arrow-left"></i> Volver al inicio
+    </a>
+
+    <partial name="_FeedPublicacion" model="Model" />
+
+    @if (!autenticado)
+    {
+        <div class="as-tarjeta as-tarjeta-unete text-center">
+            <h2 class="mb-2">Únete a ASOFOTEC</h2>
+            <p class="mb-3">Crea tu cuenta para dar me gusta, comentar y participar en la comunidad.</p>
+            <a asp-controller="Auth" asp-action="Register" class="btn btn-as me-1 mb-1">Registrarse</a>
+            <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@enlace" class="btn btn-as-outline mb-1">Iniciar sesión</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/comentarios.js" asp-append-version="true"></script>
+}

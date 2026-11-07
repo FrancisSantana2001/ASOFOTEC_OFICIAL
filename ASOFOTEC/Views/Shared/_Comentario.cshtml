@@ -1,0 +1,14 @@
+@using ASOFOTEC.Dtos
+@model ComentarioDto
+
+@* Un hilo: el comentario principal y, debajo, sus respuestas *@
+<div class="comentario-hilo" data-hilo-id="@Model.id">
+    <partial name="_ComentarioItem" model="Model" />
+
+    <div class="lista-respuestas">
+        @foreach (var respuesta in Model.Respuestas)
+        {
+            <partial name="_ComentarioItem" model="respuesta" />
+        }
+    </div>
+</div>

@@ -1,0 +1,37 @@
+@using ASOFOTEC.Dtos
+@model CompartirVm
+@{
+    var enlace = Uri.EscapeDataString(Model.Url);
+    var textoWhatsApp = Uri.EscapeDataString(Model.Titulo + " " + Model.Url);
+}
+
+@* Compartir por enlace: copiar, WhatsApp, Facebook y el menú de compartir del celular (si existe) *@
+<div class="dropdown d-inline-block">
+    <button type="button" class="@Model.Clase" data-bs-toggle="dropdown"
+            data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false"
+            title="Compartir" aria-label="Compartir">
+        <i class="bi bi-share"></i><span class="d-none d-sm-inline ms-1">Compartir</span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+        <li>
+            <button type="button" class="dropdown-item btn-copiar-enlace" data-url="@Model.Url">
+                <i class="bi bi-link-45deg me-2"></i>Copiar enlace
+            </button>
+        </li>
+        <li>
+            <a class="dropdown-item" href="https://wa.me/?text=@textoWhatsApp" target="_blank" rel="noopener">
+                <i class="bi bi-whatsapp me-2"></i>WhatsApp
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="https://www.facebook.com/sharer/sharer.php?u=@enlace" target="_blank" rel="noopener">
+                <i class="bi bi-facebook me-2"></i>Facebook
+            </a>
+        </li>
+        <li class="btn-compartir-nativo-item">
+            <button type="button" class="dropdown-item btn-compartir-nativo" data-url="@Model.Url" data-titulo="@Model.Titulo">
+                <i class="bi bi-box-arrow-up me-2"></i>Más opciones...
+            </button>
+        </li>
+    </ul>
+</div>

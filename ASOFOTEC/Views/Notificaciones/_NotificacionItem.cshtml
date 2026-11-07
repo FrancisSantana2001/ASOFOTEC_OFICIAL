@@ -1,0 +1,36 @@
+@using ASOFOTEC.Dtos
+@model NotificacionDto
+@{
+    var avatar = AvatarVm.De(Model.ActorNombre, Model.ActorFoto, "feed-avatar");
+
+    var icono = Model.Tipo switch
+    {
+        "like" => "bi-hand-thumbs-up-fill",
+        "comentario" => "bi-chat-fill",
+        "respuesta" => "bi-reply-fill",
+        "seguidor" => "bi-person-plus-fill",
+        "solucion" => "bi-lightbulb-fill",
+        _ => "bi-bell-fill"
+    };
+}
+
+<a class="notif-item @(Model.Leida ? "" : "no-leida")" asp-controller="Notificaciones" asp-action="Abrir" asp-route-id="@Model.Id">
+    <span class="notif-avatar">
+        <partial name="_Avatar" model="avatar" />
+        <span class="notif-tipo notif-tipo-@Model.Tipo"><i class="bi @icono"></i></span>
+    </span>
+
+    <span class="notif-cuerpo">
+        <span class="notif-texto"><strong>@Model.ActorNombre</strong> @Model.Mensaje</span>
+        @if (!string.IsNullOrWhiteSpace(Model.Extracto))
+        {
+            <span class="notif-extracto">“@Model.Extracto”</span>
+        }
+        <span class="notif-fecha">@FeedHelper.TiempoRelativo(Model.Fecha)</span>
+    </span>
+
+    @if (!Model.Leida)
+    {
+        <span class="notif-punto" title="Sin leer"></span>
+    }
+</a>

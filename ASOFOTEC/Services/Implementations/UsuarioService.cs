@@ -17,5 +17,6 @@ namespace ASOFOTEC.Services.Implementations
         {
             return await _context.usuarios.CountAsync();
         }
+
     }
 }

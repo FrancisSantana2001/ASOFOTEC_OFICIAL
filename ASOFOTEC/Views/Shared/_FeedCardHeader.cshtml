@@ -1,0 +1,73 @@
+@using ASOFOTEC.Dtos
+@model FeedItemDto
+@{
+    // El menú de eliminar solo existe para el autor del elemento
+    var usuarioActualId = Context.ObtenerUsuarioId();
+    var esAutor = usuarioActualId.HasValue && Model.UsuarioId.HasValue && usuarioActualId.Value == Model.UsuarioId.Value;
+    // El DBA puede eliminar contenido ajeno (moderación); el servidor lo vuelve a comprobar
+    var puedeEliminar = esAutor || Context.EsDba();
+    var avatar = AvatarVm.De(Model.UsuarioNombre, Model.UsuarioFoto, "feed-avatar");
+
+    var controlador = Model.Tipo == FeedItemDto.TipoProblema ? "Problema"
+                    : Model.Tipo == FeedItemDto.TipoSolucion ? "Solucion"
+                    : "Publicacion";
+    var accion = Model.Tipo == FeedItemDto.TipoPublicacion ? "Eliminar" : "Delete";
+
+    var mensajeConfirmar = Model.Tipo == FeedItemDto.TipoProblema
+        ? "¿Deseas eliminar este problema? Se borrarán también sus soluciones y comentarios."
+        : Model.Tipo == FeedItemDto.TipoSolucion
+            ? "¿Deseas eliminar esta solución? Se borrarán también sus comentarios."
+            : "¿Deseas eliminar esta publicación? Se borrarán también sus comentarios.";
+
+    var etiqueta = Model.Tipo == FeedItemDto.TipoProblema ? "publicó un problema"
+                 : Model.Tipo == FeedItemDto.TipoSolucion ? "propuso una solución"
+                 : "";
+}
+
+<div class="d-flex align-items-center gap-2 mb-2">
+    <partial name="_Avatar" model="avatar" />
+
+    <div class="flex-grow-1 lh-sm" style="min-width:0">
+        <div class="small">
+            @if (Model.UsuarioId.HasValue && usuarioActualId.HasValue)
+            {
+                <a asp-controller="Perfil" asp-action="@(esAutor ? "Index" : "Ver")" asp-route-id="@(esAutor ? null : Model.UsuarioId)"
+                   class="fw-semibold text-dark text-decoration-none">@Model.UsuarioNombre</a>
+            }
+            else
+            {
+                <span class="fw-semibold">@Model.UsuarioNombre</span>
+            }
+            @if (!string.IsNullOrEmpty(etiqueta))
+            {
+                <span class="text-muted">@etiqueta</span>
+            }
+        </div>
+        <small class="text-muted">@FeedHelper.TiempoRelativo(Model.Fecha)</small>
+    </div>
+
+    @if (puedeEliminar)
+    {
+        <div class="dropdown">
+            <button class="btn btn-sm btn-light rounded-circle comentario-menu-btn"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    data-bs-popper-config='{"strategy":"fixed"}'
+                    aria-expanded="false"
+                    aria-label="Opciones">
+                <i class="bi bi-three-dots"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                <li>
+                    <form asp-controller="@controlador" asp-action="@accion" method="post"
+                          data-confirm="@mensajeConfirmar">
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="bi bi-trash me-2"></i>Eliminar
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    }
+</div>

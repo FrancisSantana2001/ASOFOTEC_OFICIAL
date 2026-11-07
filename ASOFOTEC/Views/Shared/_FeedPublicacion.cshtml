@@ -1,0 +1,68 @@
+@using ASOFOTEC.Dtos
+@model FeedItemDto
+@{
+    var abierto = (ViewData["PanelAbierto"] as bool?) == true;
+    var panelComentarios = new PanelComentariosVm
+    {
+        Campo = "PublicacionId",
+        DestinoId = Model.Id,
+        Comentarios = Model.Comentarios,
+        Abierto = abierto
+    };
+    var compartir = new CompartirVm
+    {
+        Url = Url.Action("Ver", "Publicacion", new { id = Model.Id }, Context.Request.Scheme)!,
+        Titulo = $"Publicación de {Model.UsuarioNombre} en ASOFOTEC"
+    };
+}
+
+<article class="card feed-card border-0 shadow-sm mb-3">
+    <div class="card-body p-3">
+        <partial name="_FeedCardHeader" model="Model" />
+
+        @if (!string.IsNullOrWhiteSpace(Model.Contenido))
+        {
+            <p class="mb-2 feed-text">@Model.Contenido</p>
+        }
+
+        <!-- Foto o video adjunto -->
+        @if (!string.IsNullOrEmpty(Model.MediaUrl))
+        {
+            if (Model.MediaTipo == "video")
+            {
+                <video class="feed-media mb-2" controls preload="metadata" playsinline src="@Model.MediaUrl"></video>
+            }
+            else
+            {
+                <a href="@Model.MediaUrl" target="_blank" rel="noopener">
+                    <img src="@Model.MediaUrl" class="feed-img mb-2" alt="Imagen de la publicación" loading="lazy" />
+                </a>
+            }
+        }
+
+        <!-- Acciones: me gusta y comentarios -->
+        <div class="d-flex align-items-center gap-2 pt-2 border-top">
+            <button type="button"
+                    class="btn btn-sm btn-like-pub @(Model.UsuarioDioLike ? "btn-success" : "btn-outline-success")"
+                    data-publicacion-id="@Model.Id" title="Me gusta" aria-label="Me gusta">
+                <i class="bi @(Model.UsuarioDioLike ? "bi-hand-thumbs-up-fill" : "bi-hand-thumbs-up")"></i>
+                <span class="like-count">@Model.TotalLikes</span>
+            </button>
+
+            <button class="btn btn-sm btn-outline-success btn-toggle-comentarios"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#panel-comentarios-pub-@Model.Id"
+                    aria-expanded="@(abierto ? "true" : "false")"
+                    aria-controls="panel-comentarios-pub-@Model.Id"
+                    title="Comentarios">
+                <i class="bi bi-chat"></i>
+                <span class="contador-comentarios">@Model.TotalComentarios</span>
+            </button>
+
+            <div class="ms-auto"><partial name="_Compartir" model="compartir" /></div>
+        </div>
+
+        <partial name="_PanelComentarios" model="panelComentarios" />
+    </div>
+</article>

@@ -14,42 +14,80 @@ namespace ASOFOTEC.Services.Implementations
             _Context = dbContext;
         }
 
-        //Obtener todos los problemas
-        public async Task<List<ProblemaDto>> ObtenerTodosAsync()
+        // Proyección común: datos del problema + lo necesario para saber en qué paso de la ruta va
+        private static IQueryable<ProblemaDto> Proyectar(IQueryable<Problema> consulta)
         {
-            return await _Context.problemas
-                .OrderByDescending(p => p.FechaCreación)
-                .Select(p => new ProblemaDto
-                {
-                    Id = p.Id,
-                    Titulo = p.Titulo,
-                    Descripcion = p.Descripcion,
-                    Categoria = p.Categoria,
-                    ImageUrl = p.ImgeUrl,
-                    Fecha_Creacion = p.FechaCreación
-                })
+            return consulta.Select(p => new ProblemaDto
+            {
+                Id = p.Id,
+                Titulo = p.Titulo,
+                Descripcion = p.Descripcion,
+                Categoria = p.Categoria,
+                ImageUrl = p.ImgeUrl,
+                Fecha_Creacion = p.FechaCreación,
+                UsuarioId = p.UsuarioId,
+                UsuarioNombre = p.Usuario != null ? p.Usuario.Nombre + " " + p.Usuario.Apellido : null,
+                CausasDocumentadas = (p.Causas ?? "") != "" || (p.Consecuencias ?? "") != "",
+                TotalSoluciones = p.Soluciones.Count(),
+                Seleccionada = p.Soluciones.Any(s => s.Seleccionada),
+                TotalAvances = p.Soluciones.Where(s => s.Seleccionada).SelectMany(s => s.Avances).Count(),
+                Resuelto = p.Soluciones.Any(s => s.Seleccionada && s.FechaResultados != null)
+            });
+        }
+
+        //Obtener todos los problemas
+        public async Task<List<ProblemaDto>> ObtenerTodosAsync(string? busqueda = null)
+        {
+            var consulta = _Context.problemas.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(busqueda))
+            {
+                var texto = busqueda.Trim();
+                consulta = consulta.Where(p =>
+                    (p.Titulo ?? "").Contains(texto) ||
+                    (p.Descripcion ?? "").Contains(texto) ||
+                    (p.Categoria ?? "").Contains(texto));
+            }
+
+            return await Proyectar(consulta.OrderByDescending(p => p.FechaCreación))
                 .ToListAsync();
         }
+
+        public async Task<List<ProblemaDto>> ObtenerProyectosAsync()
+        {
+            return await Proyectar(_Context.problemas
+                    .Where(p => p.Soluciones.Any(s => s.Seleccionada))
+                    .OrderByDescending(p => p.FechaCreación))
+                .ToListAsync();
+        }
+
+        public async Task<int> ObtenerTotalProyectosAsync()
+        {
+            return await _Context.problemas
+                .CountAsync(p => p.Soluciones.Any(s => s.Seleccionada && s.FechaResultados == null));
+        }
+
+        public async Task<int> ObtenerTotalResueltosAsync()
+        {
+            return await _Context.problemas
+                .CountAsync(p => p.Soluciones.Any(s => s.Seleccionada && s.FechaResultados != null));
+        }
+
         //Obtener un problema por su ID
         public async Task<ProblemaDto?> ObtenerPorIdAsync(int id)
         {
-            var problema = await _Context.problemas
-                .Where(p => p.Id == id)
-                .Select(p=> new ProblemaDto
-                {
-                    Id = p.Id,
-                    Titulo = p.Titulo,
-                    Descripcion = p.Descripcion,
-                    Categoria = p.Categoria,
-                    Fecha_Creacion = p.FechaCreación
-                })
+            return await Proyectar(_Context.problemas.Where(p => p.Id == id))
                 .FirstOrDefaultAsync();
-            return problema;
         }
 
         //Crear un nuevo problema
-        public async Task<bool> CreateAsync(ProblemaCreateDto ProblemaCreateDto)
+        public async Task<bool> CreateAsync(ProblemaCreateDto ProblemaCreateDto, int usuarioId)
         { 
+            if (ProblemaCreateDto == null)
+            {
+                return false;
+            }
+
             string? RutaImagen = null;
             if(ProblemaCreateDto.Imagen != null)
             {
@@ -70,14 +108,12 @@ namespace ASOFOTEC.Services.Implementations
                 Titulo = ProblemaCreateDto.Titulo,
                 Descripcion = ProblemaCreateDto.Descripcion,
                 Categoria = ProblemaCreateDto.Categoria,
+                Causas = string.IsNullOrWhiteSpace(ProblemaCreateDto.Causas) ? null : ProblemaCreateDto.Causas.Trim(),
+                Consecuencias = string.IsNullOrWhiteSpace(ProblemaCreateDto.Consecuencias) ? null : ProblemaCreateDto.Consecuencias.Trim(),
                 ImgeUrl = RutaImagen,
-                FechaCreación = DateTime.Now
+                FechaCreación = DateTime.Now,
+                UsuarioId = usuarioId
             };
-
-            if (ProblemaCreateDto == null)
-            {
-                return false;
-            }
 
             await _Context.problemas.AddAsync(nuevoProblema);
             await _Context.SaveChangesAsync();
@@ -86,10 +122,12 @@ namespace ASOFOTEC.Services.Implementations
         }
 
         //Eliminar un problema
-        public async Task<bool> ElimiarAsync(int id)
+        public async Task<bool> ElimiarAsync(int id, int usuarioId, bool esModerador = false)
         { 
             var problema = await _Context.problemas.FindAsync(id);
-            if ( problema == null)
+
+            // Solo puede eliminarlo quien lo publicó (o el DBA, como moderación)
+            if (problema == null || (problema.UsuarioId != usuarioId && !esModerador))
             {
                 return false;
             }
@@ -100,18 +138,11 @@ namespace ASOFOTEC.Services.Implementations
 
         public async Task<List<ProblemaDto>> ObtenerDestacadosAsync(int cantidad = 3)
         {
-            return await _Context.problemas
-                .OrderByDescending(p => p.FechaCreación)
-                .Take(cantidad)
-                .Select(p => new ProblemaDto
-                {
-                    Id = p.Id,
-                    Titulo = p.Titulo,
-                    Descripcion = p.Descripcion,
-                    Categoria = p.Categoria,
-                    ImageUrl = p.ImgeUrl,
-                    Fecha_Creacion = p.FechaCreación
-                })
+            // Destacados: los que más soluciones han recibido (y, a igualdad, los más recientes)
+            return await Proyectar(_Context.problemas
+                    .OrderByDescending(p => p.Soluciones.Count())
+                    .ThenByDescending(p => p.FechaCreación)
+                    .Take(cantidad))
                 .ToListAsync();
         }
 

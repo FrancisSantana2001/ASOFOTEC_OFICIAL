@@ -1,0 +1,37 @@
+@using ASOFOTEC.Dtos
+@model ConexionesVm
+
+@{
+    ViewData["Title"] = Model.EsSeguidores ? "Seguidores" : "Siguiendo";
+}
+
+<div class="mx-auto mt-2" style="max-width:640px">
+    <a asp-action="@(Context.ObtenerUsuarioId() == Model.PerfilId ? "Index" : "Ver")" asp-route-id="@(Context.ObtenerUsuarioId() == Model.PerfilId ? null : (int?)Model.PerfilId)"
+       class="btn btn-sm btn-link text-decoration-none ps-0 mb-2">
+        <i class="bi bi-arrow-left"></i> @Model.PerfilNombre
+    </a>
+
+    <ul class="nav nav-pills mb-3">
+        <li class="nav-item">
+            <a class="nav-link @(Model.EsSeguidores ? "active bg-success" : "text-success")" asp-action="Conexiones" asp-route-id="@Model.PerfilId" asp-route-tipo="seguidores">Seguidores</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(!Model.EsSeguidores ? "active bg-success" : "text-success")" asp-action="Conexiones" asp-route-id="@Model.PerfilId" asp-route-tipo="siguiendo">Siguiendo</a>
+        </li>
+    </ul>
+
+    <div class="as-tarjeta-simple">
+        @if (!Model.Personas.Any())
+        {
+            <p class="text-muted text-center mb-0 py-3">
+                @(Model.EsSeguidores ? "Todavía no tiene seguidores." : "Todavía no sigue a nadie.")
+            </p>
+        }
+
+        @foreach (var persona in Model.Personas)
+        {
+            <partial name="_Persona" model="persona" />
+        }
+    </div>
+</div>
+

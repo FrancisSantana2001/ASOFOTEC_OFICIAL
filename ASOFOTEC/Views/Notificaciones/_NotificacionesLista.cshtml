@@ -1,0 +1,17 @@
+@using ASOFOTEC.Dtos
+@model List<NotificacionDto>
+
+@if (!Model.Any())
+{
+    <div class="text-center text-muted small py-4 px-3">
+        <i class="bi bi-bell-slash d-block fs-3 mb-1"></i>
+        Aún no tienes notificaciones. Aquí verás quién te da me gusta, te comenta o te sigue.
+    </div>
+}
+else
+{
+    foreach (var n in Model)
+    {
+        <partial name="_NotificacionItem" model="n" />
+    }
+}

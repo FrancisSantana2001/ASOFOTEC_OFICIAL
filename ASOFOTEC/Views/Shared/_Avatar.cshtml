@@ -1,0 +1,17 @@
+@using ASOFOTEC.Dtos
+@model AvatarVm
+
+@{
+    // Cada persona tiene su propio color (siempre el mismo, según su nombre)
+    var colorClase = "avatar-c" + FeedHelper.ColorAvatar(Model.Nombre);
+}
+
+@* Foto de la persona o, si no tiene, un círculo con sus iniciales *@
+@if (!string.IsNullOrEmpty(Model.FotoUrl))
+{
+    <img src="@Model.FotoUrl" alt="" class="@Model.Clase avatar-img" loading="lazy" />
+}
+else
+{
+    <div class="@Model.Clase @colorClase" aria-hidden="true">@FeedHelper.Iniciales(Model.Nombre)</div>
+}

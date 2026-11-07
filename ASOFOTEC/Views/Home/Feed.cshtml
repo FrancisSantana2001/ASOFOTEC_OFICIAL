@@ -1,0 +1,228 @@
+@using ASOFOTEC.Dtos
+@model FeedViewModel
+@{
+    ViewData["Title"] = "Inicio";
+    var esPopular = Model.Orden == "popular";
+    var avatarGrande = AvatarVm.De(Model.Usuario.Nombre, Model.Usuario.Foto, "feed-avatar-lg");
+    var avatarChico = AvatarVm.De(Model.Usuario.Nombre, Model.Usuario.Foto, "feed-avatar");
+}
+
+<div class="row g-3 mt-1">
+
+    <!-- ===== Columna izquierda: perfil y accesos ===== -->
+    <aside class="col-lg-3 d-none d-lg-block">
+        <div class="feed-sticky">
+            <div class="card border-0 shadow-sm mb-3 overflow-hidden">
+                <!-- Portada del usuario (o un degradado de la marca si no tiene) -->
+                @if (!string.IsNullOrEmpty(Model.Usuario.Portada))
+                {
+                    <div class="perfil-mini-portada" style="background-image:url('@Model.Usuario.Portada')"></div>
+                }
+                else
+                {
+                    <div class="perfil-mini-portada"></div>
+                }
+                <div class="card-body text-center p-3 pt-0">
+                    <div class="perfil-mini-avatar mx-auto mb-2"><partial name="_Avatar" model="avatarGrande" /></div>
+                    <a asp-controller="Perfil" asp-action="Index" class="fw-semibold text-decoration-none text-dark">@Model.Usuario.Nombre</a>
+                    <small class="text-muted d-block text-truncate">@Model.Usuario.Correo</small>
+
+                    <div class="row g-0 mt-3 small">
+                        <div class="col">
+                            <div class="fw-bold">@Model.Usuario.TotalPublicaciones</div>
+                            <div class="text-muted">Posts</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold">@Model.Usuario.TotalProblemas</div>
+                            <div class="text-muted">Problemas</div>
+                        </div>
+                        <div class="col">
+                            <div class="fw-bold">@Model.Usuario.TotalSoluciones</div>
+                            <div class="text-muted">Soluciones</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="list-group shadow-sm border-0 small">
+                <a asp-controller="Home" asp-action="Index" class="list-group-item list-group-item-action active border-0">
+                    <i class="bi bi-rss me-2"></i>Feed
+                </a>
+                <a asp-controller="Problema" asp-action="Index" class="list-group-item list-group-item-action border-0">
+                    <i class="bi bi-compass me-2"></i>Explorar problemas
+                </a>
+                <a asp-controller="Personas" asp-action="Index" class="list-group-item list-group-item-action border-0">
+                    <i class="bi bi-people me-2"></i>Personas
+                </a>
+                <a asp-controller="Problema" asp-action="Create" class="list-group-item list-group-item-action border-0">
+                    <i class="bi bi-plus-circle me-2"></i>Publicar un problema
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===== Columna central: feed ===== -->
+    <section class="col-12 col-lg-6">
+
+        <!-- Nueva publicación (texto, foto o video) -->
+        <div class="card feed-card border-0 shadow-sm mb-3">
+            <div class="card-body p-3">
+                <form id="form-publicacion" asp-controller="Publicacion" asp-action="Crear" method="post"
+                      enctype="multipart/form-data">
+                    <div class="d-flex gap-2">
+                        <partial name="_Avatar" model="avatarChico" />
+                        <textarea name="Contenido"
+                                  class="form-control"
+                                  rows="2"
+                                  maxlength="500"
+                                  placeholder="¿Qué quieres compartir con la comunidad?"
+                                  style="resize:none"></textarea>
+                    </div>
+
+                    <!-- Vista previa del archivo seleccionado -->
+                    <div id="adjunto-preview" class="adjunto-preview d-none mt-2">
+                        <button type="button" id="adjunto-quitar" class="btn btn-sm btn-dark rounded-circle adjunto-quitar"
+                                aria-label="Quitar archivo"><i class="bi bi-x-lg"></i></button>
+                        <div id="adjunto-contenido"></div>
+                    </div>
+
+                    <!-- Un solo archivo por publicación: foto (máx. 5 MB) o video (máx. 50 MB) -->
+                    <input type="file" name="Archivo" id="archivo-input" class="d-none" />
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            <a asp-controller="Problema" asp-action="Create" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-exclamation-circle"></i> Publicar un problema
+                            </a>
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-adjuntar" data-tipo="imagen">
+                                <i class="bi bi-image"></i> Foto
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-adjuntar" data-tipo="video">
+                                <i class="bi bi-camera-video"></i> Video
+                            </button>
+                        </div>
+                        <button type="submit" id="btn-publicar" class="btn btn-sm btn-success px-3">Publicar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Búsqueda y orden -->
+        <div class="d-flex gap-2 mb-3">
+            <form asp-controller="Home" asp-action="Index" method="get" class="flex-grow-1">
+                <input type="hidden" name="orden" value="@Model.Orden" />
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                    <input type="search" name="q" value="@Model.Busqueda" class="form-control" placeholder="Buscar en el feed" />
+                </div>
+            </form>
+
+            <div class="btn-group btn-group-sm" role="group" aria-label="Orden del feed">
+                <a asp-controller="Home" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-orden="popular"
+                   class="btn @(esPopular ? "btn-primary" : "btn-outline-primary")">Popular</a>
+                <a asp-controller="Home" asp-action="Index" asp-route-q="@Model.Busqueda" asp-route-orden="reciente"
+                   class="btn @(!esPopular ? "btn-primary" : "btn-outline-primary")">Reciente</a>
+            </div>
+        </div>
+
+        <!-- Elementos del feed -->
+        @if (!Model.Items.Any())
+        {
+            <div class="alert alert-info small">
+                @(string.IsNullOrEmpty(Model.Busqueda)
+                    ? "Todavía no hay publicaciones. ¡Sé el primero en compartir algo!"
+                    : "No se encontraron resultados para tu búsqueda.")
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model.Items)
+            {
+                if (item.Tipo == FeedItemDto.TipoProblema)
+                {
+                    <partial name="_FeedProblema" model="item" />
+                }
+                else if (item.Tipo == FeedItemDto.TipoSolucion)
+                {
+                    <partial name="_FeedSolucion" model="item" />
+                }
+                else
+                {
+                    <partial name="_FeedPublicacion" model="item" />
+                }
+            }
+
+            if (Model.HayMas)
+            {
+                <div class="text-center mb-4">
+                    <a asp-controller="Home" asp-action="Index"
+                       asp-route-q="@Model.Busqueda"
+                       asp-route-orden="@Model.Orden"
+                       asp-route-cantidad="@(Model.Cantidad + 10)"
+                       class="btn btn-sm btn-outline-secondary px-4">Ver más</a>
+                </div>
+            }
+        }
+    </section>
+
+    <!-- ===== Columna derecha: destacados y comunidad ===== -->
+    <aside class="col-lg-3 d-none d-lg-block">
+        <div class="feed-sticky">
+            @if (Model.Sugerencias.Any())
+            {
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold mb-1">Personas que quizá conozcas</h6>
+                        @foreach (var persona in Model.Sugerencias)
+                        {
+                            <partial name="_Persona" model="persona" />
+                        }
+                        <a asp-controller="Personas" asp-action="Index" class="small text-decoration-none">Ver más personas</a>
+                    </div>
+                </div>
+            }
+
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body p-3">
+                    <h6 class="fw-bold mb-3">Problemas destacados</h6>
+
+                    @if (!Model.ProblemasDestacados.Any())
+                    {
+                        <p class="text-muted small mb-0">Aún no hay problemas.</p>
+                    }
+
+                    @foreach (var p in Model.ProblemasDestacados)
+                    {
+                        <a asp-controller="Problema" asp-action="Details" asp-route-id="@p.Id"
+                           class="feed-lateral-item mb-2">
+                            <div class="small fw-semibold feed-lateral-titulo text-truncate">@p.Titulo</div>
+                            <small class="text-muted">@p.Categoria · @p.TotalSoluciones soluciones</small>
+                        </a>
+                    }
+
+                    <a asp-controller="Problema" asp-action="Index" class="small text-decoration-none">Ver todos</a>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-3">
+                    <h6 class="fw-bold mb-3">Comunidad</h6>
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Miembros</span><strong>@Model.TotalUsuarios</strong>
+                    </div>
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Problemas</span><strong>@Model.TotalProblemas</strong>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span class="text-muted">Soluciones</span><strong>@Model.TotalSoluciones</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+@section Scripts {
+    <script src="~/js/comentarios.js" asp-append-version="true"></script>
+    <script src="~/js/publicaciones.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,24 @@
+@using ASOFOTEC.Dtos
+@model PerfilVm
+
+<div class="perfil-portada-acciones">
+    <form asp-controller="Perfil" asp-action="CambiarFoto" method="post" enctype="multipart/form-data"
+          class="form-foto" data-max-mb="5">
+        <input type="hidden" name="tipo" value="portada" />
+        <input type="file" name="archivo" class="d-none" accept="image/jpeg,image/png,image/webp" />
+        <button type="button" class="btn btn-sm btn-light btn-elegir-foto">
+            <i class="bi bi-camera me-1"></i>@(string.IsNullOrEmpty(Model.FotoPortadaUrl) ? "Agregar portada" : "Cambiar portada")
+        </button>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.FotoPortadaUrl))
+    {
+        <form asp-controller="Perfil" asp-action="EliminarFoto" method="post"
+              data-confirm="¿Quieres quitar tu foto de portada?" data-confirm-titulo="Quitar portada" data-confirm-ok="Quitar">
+            <input type="hidden" name="tipo" value="portada" />
+            <button type="submit" class="btn btn-sm btn-light text-danger" title="Quitar portada" aria-label="Quitar portada">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    }
+</div>

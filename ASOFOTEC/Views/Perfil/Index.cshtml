@@ -1,0 +1,188 @@
+@using ASOFOTEC.Dtos
+@model PerfilVm
+
+@{
+    ViewData["Title"] = "Mi perfil";
+    var avatar = AvatarVm.De(Model.NombreCompleto, Model.FotoPerfilUrl, "feed-avatar-lg");
+    var fechaMaxima = DateTime.Today.AddYears(-15).ToString("yyyy-MM-dd");
+    var fechaMinima = DateTime.Today.AddYears(-120).ToString("yyyy-MM-dd");
+}
+
+<div class="mt-2 mb-4">
+
+    <!-- ===== Portada ===== -->
+    @if (!string.IsNullOrEmpty(Model.FotoPortadaUrl))
+    {
+        <div class="perfil-portada" style="background-image:url('@Model.FotoPortadaUrl')">
+            <partial name="_PerfilAccionesPortada" model="Model" />
+        </div>
+    }
+    else
+    {
+        <div class="perfil-portada">
+            <partial name="_PerfilAccionesPortada" model="Model" />
+        </div>
+    }
+
+    <!-- ===== Cabecera: foto, nombre y cifras ===== -->
+    <div class="perfil-cabecera">
+        <div class="d-flex flex-wrap align-items-end gap-3">
+            <div class="perfil-avatar-caja">
+                <div class="perfil-avatar"><partial name="_Avatar" model="avatar" /></div>
+
+                <form asp-controller="Perfil" asp-action="CambiarFoto" method="post" enctype="multipart/form-data"
+                      class="form-foto" data-max-mb="3">
+                    <input type="hidden" name="tipo" value="perfil" />
+                    <input type="file" name="archivo" class="d-none" accept="image/jpeg,image/png,image/webp" />
+                    <button type="button" class="btn btn-success perfil-avatar-camara btn-elegir-foto"
+                            title="Cambiar foto de perfil" aria-label="Cambiar foto de perfil">
+                        <i class="bi bi-camera"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="flex-grow-1 pb-1">
+                <h1 class="h4 mb-1">@Model.NombreCompleto</h1>
+                <div class="d-flex flex-wrap align-items-center gap-2 small text-muted">
+                    <span class="badge @(Model.Rol == "DBA" ? "text-bg-dark" : Model.Rol == "Admin" ? "text-bg-info" : "text-bg-success")">@Model.Rol</span>
+                    <span>Miembro desde @Model.FechaIngreso.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.FotoPerfilUrl))
+            {
+                <form asp-controller="Perfil" asp-action="EliminarFoto" method="post"
+                      data-confirm="¿Quieres quitar tu foto de perfil?" data-confirm-titulo="Quitar foto de perfil" data-confirm-ok="Quitar">
+                    <input type="hidden" name="tipo" value="perfil" />
+                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Quitar foto</button>
+                </form>
+            }
+        </div>
+
+        <div class="row g-0 text-center mt-3 pt-3 border-top">
+            <div class="col"><strong class="d-block">@Model.TotalPublicaciones</strong><small class="text-muted">Publicaciones</small></div>
+            <div class="col"><strong class="d-block">@Model.TotalProblemas</strong><small class="text-muted">Problemas</small></div>
+            <div class="col"><strong class="d-block">@Model.TotalSoluciones</strong><small class="text-muted">Soluciones</small></div>
+            <div class="col"><strong class="d-block">@Model.TotalComentarios</strong><small class="text-muted">Comentarios</small></div>
+            <div class="col">
+                <a asp-action="Conexiones" asp-route-id="@Model.Id" asp-route-tipo="seguidores" class="text-decoration-none text-dark">
+                    <strong class="d-block">@Model.Seguidores</strong><small class="text-muted">Seguidores</small>
+                </a>
+            </div>
+            <div class="col">
+                <a asp-action="Conexiones" asp-route-id="@Model.Id" asp-route-tipo="siguiendo" class="text-decoration-none text-dark">
+                    <strong class="d-block">@Model.Siguiendo</strong><small class="text-muted">Siguiendo</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+
+        <!-- ===== Datos personales ===== -->
+        <div class="col-lg-7">
+            <div class="as-tarjeta-simple">
+                <h2 class="h5 as-pagina-titulo mb-3">Mis datos</h2>
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+                <form asp-action="Editar" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Edicion.Nombre" class="form-label">Nombre</label>
+                            <input asp-for="Edicion.Nombre" class="form-control" maxlength="50" />
+                            <span asp-validation-for="Edicion.Nombre" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Edicion.Apellido" class="form-label">Apellido</label>
+                            <input asp-for="Edicion.Apellido" class="form-control" maxlength="50" />
+                            <span asp-validation-for="Edicion.Apellido" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="correo-perfil">Correo electrónico</label>
+                        <input id="correo-perfil" class="form-control" value="@Model.Correo" disabled />
+                        <div class="form-text">El correo no se puede cambiar.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Edicion.Telefono" class="form-label">Número de teléfono</label>
+                        <input asp-for="Edicion.Telefono" type="tel" inputmode="tel" class="form-control"
+                               pattern="^\+?[0-9\s\-\(\)\.]{7,20}$"
+                               title="Solo números (de 7 a 15 dígitos). Puedes usar espacios, guiones y + al inicio." />
+                        <span asp-validation-for="Edicion.Telefono" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="FechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                            <input asp-for="Edicion.FechaNacimiento" id="FechaNacimiento" type="date" class="form-control"
+                                   min="@fechaMinima" max="@fechaMaxima" />
+                            <div id="edad-calculada" class="edad-calculada text-muted mt-1" aria-live="polite">
+                                @(Model.Edad.HasValue ? $"Edad: {Model.Edad} años" : "Debes tener al menos 15 años.")
+                            </div>
+                            <span asp-validation-for="Edicion.FechaNacimiento" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <span class="form-label d-block">Sexo</span>
+                            <div class="pt-1">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" asp-for="Edicion.Sexo" value="Masculino" id="sexoMasculino" />
+                                    <label class="form-check-label" for="sexoMasculino">Masculino</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" asp-for="Edicion.Sexo" value="Femenino" id="sexoFemenino" />
+                                    <label class="form-check-label" for="sexoFemenino">Femenino</label>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Edicion.Sexo" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-as">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== Cuenta y privacidad ===== -->
+        <div class="col-lg-5">
+            <div class="as-tarjeta-simple">
+                <h2 class="h5 as-pagina-titulo mb-3">Mi cuenta</h2>
+
+                <dl class="row small mb-3">
+                    <dt class="col-5 text-muted fw-normal">Rol</dt>
+                    <dd class="col-7">@Model.Rol</dd>
+                    <dt class="col-5 text-muted fw-normal">Edad</dt>
+                    <dd class="col-7">@(Model.Edad.HasValue ? $"{Model.Edad} años" : "Sin registrar")</dd>
+                    <dt class="col-5 text-muted fw-normal">Miembro desde</dt>
+                    <dd class="col-7">@Model.FechaIngreso.ToString("dd/MM/yyyy")</dd>
+                </dl>
+
+                <div class="alert alert-light border small mb-3">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    Tu correo, teléfono, fecha de nacimiento y sexo <strong>no se muestran a otros usuarios</strong>.
+                    Lo que sí es público es tu nombre, tu foto de perfil y lo que publicas.
+                </div>
+
+                <p class="small mb-2">
+                    <a asp-controller="Chat" asp-action="Bloqueados" class="text-decoration-none">
+                        <i class="bi bi-slash-circle me-1"></i>Personas bloqueadas
+                    </a>
+                </p>
+
+                <p class="small text-muted mb-0">
+                    Para solicitar la eliminación de tu cuenta o de tus datos, consulta la
+                    <a asp-controller="Home" asp-action="Privacy">política de privacidad</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/registro.js" asp-append-version="true"></script>
+    <script src="~/js/perfil.js" asp-append-version="true"></script>
+}

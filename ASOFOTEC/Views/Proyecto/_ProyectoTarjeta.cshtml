@@ -1,0 +1,30 @@
+@using ASOFOTEC.Dtos
+@model ProblemaDto
+
+<div class="as-tarjeta-simple d-flex flex-column">
+    <div class="d-flex flex-wrap gap-1 mb-2">
+        <span class="badge bg-success">@Model.Categoria</span>
+        <span class="badge text-bg-@RutaProblemaHelper.Color(Model.Etapa)">@RutaProblemaHelper.NombreEstado(Model.Etapa)</span>
+    </div>
+
+    <h3 class="h6 fw-bold mb-1">@Model.Titulo</h3>
+    <p class="small text-muted mb-3">@FeedHelper.Resumir(Model.Descripcion, 110)</p>
+
+    <div class="mt-auto">
+        <div class="d-flex justify-content-between small mb-1">
+            <span class="text-muted">Paso @Model.Etapa de @RutaProblemaHelper.TotalPasos</span>
+            @if (Model.TotalAvances > 0)
+            {
+                <span class="text-muted">@Model.TotalAvances avances</span>
+            }
+        </div>
+        <div class="progress mb-3" style="height:6px" role="progressbar" aria-label="Paso de la ruta"
+             aria-valuenow="@Model.Etapa" aria-valuemin="0" aria-valuemax="@RutaProblemaHelper.TotalPasos">
+            <div class="progress-bar bg-@RutaProblemaHelper.Color(Model.Etapa)"
+                 style="width:@(RutaProblemaHelper.Porcentaje(Model.Etapa))%"></div>
+        </div>
+
+        <a asp-controller="Problema" asp-action="Details" asp-route-id="@Model.Id" asp-route-paso="@(Model.Etapa >= 6 ? Model.Etapa : 5)"
+           class="btn btn-sm btn-as-outline w-100">Ver proyecto</a>
+    </div>
+</div>

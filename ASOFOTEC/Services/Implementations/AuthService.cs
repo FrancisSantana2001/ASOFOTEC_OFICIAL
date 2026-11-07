@@ -1,5 +1,6 @@
 ﻿using ASOFOTEC.Data;
 using ASOFOTEC.Dtos;
+using ASOFOTEC.Helpers;
 using ASOFOTEC.Models;
 using ASOFOTEC.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +19,32 @@ namespace ASOFOTEC.Services.Implementations
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto register)
         {
+            // Validaciones del servidor (no dependen de lo que haga el navegador)
+            var errorFecha = DatosPersonalesHelper.ValidarFechaNacimiento(register.FechaNacimiento);
+            if (errorFecha != null)
+            {
+                return new AuthResponseDto { Success = false, Message = errorFecha };
+            }
+
+            var telefono = DatosPersonalesHelper.NormalizarTelefono(register.Telefono);
+            if (telefono == null)
+            {
+                return new AuthResponseDto { Success = false, Message = "Ingresa un número de teléfono válido." };
+            }
+
+            if (!DatosPersonalesHelper.SexoValido(register.Sexo))
+            {
+                return new AuthResponseDto { Success = false, Message = "Selecciona Masculino o Femenino." };
+            }
+
+            if (!register.AceptaPolitica)
+            {
+                return new AuthResponseDto { Success = false, Message = "Debes aceptar la política de privacidad." };
+            }
+
+            var correo = register.Correo.Trim();
             var exist = await _Context.usuarios
-                .AnyAsync(u => u.Correo == register.Correo);
+                .AnyAsync(u => u.Correo == correo);
             if (exist)
             {
                 return new AuthResponseDto
@@ -31,11 +56,15 @@ namespace ASOFOTEC.Services.Implementations
 
             var usuario = new Usuario
             {
-                Nombre = register.Nombre,
-                Apellido = register.Apellido,
-                Correo = register.Correo,
+                Nombre = register.Nombre.Trim(),
+                Apellido = register.Apellido.Trim(),
+                Correo = correo,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(register.Contraseña),
-                Fecha_Ingreso = DateTime.Now
+                Fecha_Ingreso = DateTime.Now,
+                Telefono = telefono,
+                FechaNacimiento = register.FechaNacimiento!.Value.Date,
+                Sexo = register.Sexo,
+                Activo = true
             };
 
             await _Context.usuarios.AddAsync(usuario);
@@ -70,7 +99,7 @@ namespace ASOFOTEC.Services.Implementations
         public async Task<AuthResponseDto> LoginAsync(LoginDto login) 
         { 
             var usuario = await _Context.usuarios
-                .FirstOrDefaultAsync(u=> u.Correo == login.Correo);
+                .FirstOrDefaultAsync(u=> u.Correo == login.Correo.Trim());
             if(usuario == null)
             {
                 return new AuthResponseDto
@@ -90,6 +119,16 @@ namespace ASOFOTEC.Services.Implementations
                 };
             }
 
+            // Las cuentas desactivadas por el administrador no pueden iniciar sesión
+            if (!usuario.Activo)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Tu cuenta está desactivada. Comunícate con el administrador de ASOFOTEC."
+                };
+            }
+
             var rol = await _Context.RolesUser
                 .Where(u => u.Usuario_Id == usuario.Id)
                 .Select(ur=> ur.Rol.Nombre)
@@ -103,7 +142,8 @@ namespace ASOFOTEC.Services.Implementations
                 Message = "Inicio de sesión exitoso.",
                 Token = token,
                 Nombre = $"{usuario.Nombre} {usuario.Apellido}",
-                Rol = rol
+                Rol = rol,
+                FotoPerfilUrl = usuario.FotoPerfilUrl
             };
         }
     }

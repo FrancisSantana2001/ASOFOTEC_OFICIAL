@@ -1,0 +1,49 @@
+@using ASOFOTEC.Dtos
+@model PersonasVm
+
+@{
+    ViewData["Title"] = "Personas";
+}
+
+<div class="mx-auto mt-2" style="max-width:760px">
+    <h1 class="h2 as-pagina-titulo">Personas</h1>
+    <p class="text-muted">Encuentra a otros miembros, síguelos y mantente al tanto de lo que publican.</p>
+
+    <form asp-action="Index" method="get" class="mb-4" role="search">
+        <div class="input-group">
+            <input type="search" name="q" value="@Model.Busqueda" class="form-control" placeholder="Buscar personas por nombre" aria-label="Buscar personas" />
+            <button class="btn btn-as" type="submit"><i class="bi bi-search"></i></button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Busqueda))
+    {
+        <h2 class="h5 as-pagina-titulo mb-2">Resultados para “@Model.Busqueda”</h2>
+        <div class="as-tarjeta-simple mb-4">
+            @if (!Model.Resultados.Any())
+            {
+                <p class="text-muted mb-0">No encontramos a nadie con ese nombre.</p>
+            }
+            @foreach (var persona in Model.Resultados)
+            {
+                <partial name="_Persona" model="persona" />
+            }
+        </div>
+    }
+
+    <h2 class="h5 as-pagina-titulo mb-2">Personas que quizá conozcas</h2>
+    <div class="as-tarjeta-simple">
+        @if (!Model.Sugerencias.Any())
+        {
+            <p class="text-muted mb-0">Por ahora no tenemos sugerencias. A medida que sigas a más personas, aparecerán aquí.</p>
+        }
+        @foreach (var persona in Model.Sugerencias)
+        {
+            <partial name="_Persona" model="persona" />
+        }
+    </div>
+
+    <p class="small text-muted mt-3">
+        Te sugerimos a quienes siguen las personas que tú sigues, a quienes ya te siguen y a los miembros más activos.
+    </p>
+</div>

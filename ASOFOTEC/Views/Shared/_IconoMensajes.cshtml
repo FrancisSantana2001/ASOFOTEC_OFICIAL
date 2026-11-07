@@ -1,0 +1,6 @@
+@* Icono de mensajes del navbar. El número de mensajes sin leer lo actualiza chat.js (SignalR) *@
+<a class="notif-btn msg-btn" asp-controller="Chat" asp-action="Index" data-mi-id="@Context.ObtenerUsuarioId()"
+   aria-label="Mensajes" title="Mensajes">
+    <i class="bi bi-chat-dots"></i>
+    <span class="notif-badge msg-badge d-none" aria-live="polite">0</span>
+</a>

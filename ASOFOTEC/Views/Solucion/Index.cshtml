@@ -1,6 +1,10 @@
 ﻿@using ASOFOTEC.Dtos
 @model List<SolucionDto>
 
+@{
+    var usuarioActualId = Context.ObtenerUsuarioId();
+}
+
 <div class="container mt-4">
 
     <h3 class="mb-4">Soluciones</h3>
@@ -13,9 +17,16 @@
                 <div class="d-flex justify-content-between">
                     <span class="badge gb-secondary">@solution.Estado</span>
                     <small>@solution.Fecha_Solucion.ToShortDateString()</small>
-                    <a class="btn btn-outline-danger btn-sm" asp-action="Delete" asp-route-id="@solution.Id">
-                        Eliminar
-                    </a>
+                    @if (Context.EsDba() || (usuarioActualId.HasValue && solution.UsuarioId == usuarioActualId.Value))
+                    {
+                        <form asp-action="Delete" method="post"
+                              data-confirm="¿Deseas eliminar esta solución? Se borrarán también sus comentarios.">
+                            <input type="hidden" name="id" value="@solution.Id" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                Eliminar
+                            </button>
+                        </form>
+                    }
                 </div>
             </div>
         </div>

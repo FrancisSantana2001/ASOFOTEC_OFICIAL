@@ -3,6 +3,10 @@
 @{
     ViewData["Title"] = "Crear Cuenta";
     Layout = "_Layout";
+
+    // Edad mínima: 15 años. El navegador no deja elegir fechas fuera de este rango
+    var fechaMaxima = DateTime.Today.AddYears(-15).ToString("yyyy-MM-dd");
+    var fechaMinima = DateTime.Today.AddYears(-120).ToString("yyyy-MM-dd");
 }
 
 <div class="auth-page">
@@ -62,10 +66,55 @@
                                 <span asp-validation-for="Correo" class="text-danger small"></span>
                             </div>
 
-                            <div class="mb-4">
+                            <div class="mb-3">
+                                <label asp-for="Telefono" class="form-label">Número de teléfono</label>
+                                <input asp-for="Telefono" type="tel" inputmode="tel" autocomplete="tel"
+                                       class="form-control" placeholder="809-555-1234"
+                                       pattern="^\+?[0-9\s\-\(\)\.]{7,20}$"
+                                       title="Solo números (de 7 a 15 dígitos). Puedes usar espacios, guiones y + al inicio." />
+                                <span asp-validation-for="Telefono" class="text-danger small"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="FechaNacimiento" class="form-label">Fecha de nacimiento</label>
+                                    <input asp-for="FechaNacimiento" type="date" class="form-control"
+                                           min="@fechaMinima" max="@fechaMaxima" />
+                                    <div id="edad-calculada" class="edad-calculada text-muted mt-1" aria-live="polite">
+                                        Debes tener al menos 15 años.
+                                    </div>
+                                    <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <span class="form-label d-block">Sexo</span>
+                                    <div class="pt-1">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" asp-for="Sexo" value="Masculino" id="sexoMasculino" />
+                                            <label class="form-check-label" for="sexoMasculino">Masculino</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" asp-for="Sexo" value="Femenino" id="sexoFemenino" />
+                                            <label class="form-check-label" for="sexoFemenino">Femenino</label>
+                                        </div>
+                                    </div>
+                                    <span asp-validation-for="Sexo" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
                                 <label asp-for="Contraseña" class="form-label">Contraseña</label>
                                 <input asp-for="Contraseña" type="password" class="form-control" placeholder="Minimo 6 caracteres" />
                                 <span asp-validation-for="Contraseña" class="text-danger small"></span>
+                            </div>
+
+                            <div class="form-check mb-4">
+                                <input asp-for="AceptaPolitica" class="form-check-input" />
+                                <label asp-for="AceptaPolitica" class="form-check-label small">
+                                    He leído y acepto la
+                                    <a asp-controller="Home" asp-action="Privacy" target="_blank" rel="noopener">política de privacidad</a>.
+                                </label>
+                                <div><span asp-validation-for="AceptaPolitica" class="text-danger small"></span></div>
                             </div>
 
                             <button type="submit"
@@ -95,4 +144,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/registro.js" asp-append-version="true"></script>
 }

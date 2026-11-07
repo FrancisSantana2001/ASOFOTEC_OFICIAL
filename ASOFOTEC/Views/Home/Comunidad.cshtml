@@ -1,0 +1,60 @@
+@model ASOFOTEC.Dtos.HomeDashboardDto
+
+@{
+    ViewData["Title"] = "Comunidad";
+    var autenticado = Context.ObtenerUsuarioId().HasValue;
+}
+
+<div class="mt-2">
+    <h1 class="h2 as-pagina-titulo">Nuestra comunidad</h1>
+    <p class="text-muted mb-4">
+        Personas de distintos oficios que ponen su talento al servicio de problemas reales.
+    </p>
+
+    <!-- Cifras -->
+    <section class="as-stats mb-4" aria-label="La comunidad en cifras">
+        <div class="row row-cols-2 row-cols-lg-4 g-3">
+            <div class="col"><div class="as-stat"><i class="bi bi-people"></i><div><strong>@Model.TotalUsuarios</strong><span>Miembros</span></div></div></div>
+            <div class="col"><div class="as-stat"><i class="bi bi-exclamation-circle"></i><div><strong>@Model.TotalProblemas</strong><span>Problemas publicados</span></div></div></div>
+            <div class="col"><div class="as-stat"><i class="bi bi-lightbulb"></i><div><strong>@Model.TotalSoluciones</strong><span>Soluciones propuestas</span></div></div></div>
+            <div class="col"><div class="as-stat"><i class="bi bi-patch-check"></i><div><strong>@Model.TotalResueltos</strong><span>Problemas resueltos</span></div></div></div>
+        </div>
+    </section>
+
+    <!-- Cómo participar -->
+    <h2 class="h5 as-pagina-titulo mb-3">Cómo puedes participar</h2>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="as-tarjeta-simple">
+                <div class="as-icono-circulo mb-3"><i class="bi bi-exclamation-circle" aria-hidden="true"></i></div>
+                <h3 class="h6 fw-bold">Publica un problema</h3>
+                <p class="small text-muted mb-0">Cuéntanos qué afecta a tu comunidad y qué lo causa.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="as-tarjeta-simple">
+                <div class="as-icono-circulo mb-3"><i class="bi bi-lightbulb" aria-hidden="true"></i></div>
+                <h3 class="h6 fw-bold">Propón soluciones</h3>
+                <p class="small text-muted mb-0">Aporta ideas, compáralas con las de otros y apoya la mejor.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="as-tarjeta-simple">
+                <div class="as-icono-circulo mb-3"><i class="bi bi-rocket-takeoff" aria-hidden="true"></i></div>
+                <h3 class="h6 fw-bold">Únete a un equipo</h3>
+                <p class="small text-muted mb-0">Ayuda a ejecutar la solución elegida y registra los avances.</p>
+            </div>
+        </div>
+    </div>
+
+    @if (!autenticado)
+    {
+        <div class="as-tarjeta as-tarjeta-unete text-center">
+            <h2 class="mb-2">Sé parte del cambio</h2>
+            <p class="mb-3">Tu talento y tus ideas pueden mejorar vidas.</p>
+            <a asp-controller="Auth" asp-action="Register" class="btn btn-as mb-2">
+                <i class="bi bi-person-plus me-1"></i>Registrarse ahora
+            </a>
+        </div>
+    }
+</div>

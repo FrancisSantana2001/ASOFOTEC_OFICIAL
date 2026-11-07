@@ -1,0 +1,40 @@
+@using ASOFOTEC.Dtos
+@model PersonaDto
+@{
+    var avatar = AvatarVm.De(Model.Nombre, Model.FotoUrl, "feed-avatar");
+    var soyYo = Context.ObtenerUsuarioId() == Model.Id;
+
+    var motivo = Model.EsAmigo ? "Amigos"
+               : Model.MeSigue ? "Te sigue"
+               : Model.EnComun > 0 ? $"{Model.EnComun} en común"
+               : "";
+}
+
+<div class="d-flex align-items-center gap-2 py-2 persona-item">
+    <a asp-controller="Perfil" asp-action="Ver" asp-route-id="@Model.Id" class="text-decoration-none" tabindex="-1" aria-hidden="true">
+        <partial name="_Avatar" model="avatar" />
+    </a>
+
+    <div class="flex-grow-1" style="min-width:0">
+        <a asp-controller="Perfil" asp-action="Ver" asp-route-id="@Model.Id"
+           class="fw-semibold text-dark text-decoration-none d-block text-truncate small">@Model.Nombre</a>
+        @if (!string.IsNullOrEmpty(motivo))
+        {
+            <small class="text-muted d-block text-truncate">@motivo</small>
+        }
+    </div>
+
+    @if (!soyYo && Model.EsAmigo)
+    {
+        <a asp-controller="Chat" asp-action="Iniciar" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary"
+           title="Enviar mensaje" aria-label="Enviar mensaje"><i class="bi bi-chat-dots"></i></a>
+    }
+
+    @if (!soyYo)
+    {
+        <button type="button"
+                class="btn btn-sm btn-seguir @(Model.SigoYo ? "btn-as-outline" : "btn-as")"
+                data-usuario-id="@Model.Id"
+                data-me-sigue="@(Model.MeSigue ? "1" : "0")">@(Model.SigoYo ? "Siguiendo" : (Model.MeSigue ? "Seguir también" : "Seguir"))</button>
+    }
+</div>

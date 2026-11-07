@@ -21,8 +21,18 @@ namespace ASOFOTEC.Models
         
         public bool Activo { get; set; } = true;
 
+        //Datos de perfil (se piden al registrarse)
+        public string? Telefono { get; set; }
+        public DateTime? FechaNacimiento { get; set; }   // la edad se calcula a partir de esta fecha
+        public string? Sexo { get; set; }                // "Masculino" o "Femenino"
+
+        //Fotos (rutas dentro de wwwroot/uploads/perfiles)
+        public string? FotoPerfilUrl { get; set; }
+        public string? FotoPortadaUrl { get; set; }
+
         //Relaciones
         public ICollection<Publicacion> Publicaciones { get; set; } = new List<Publicacion>();
+        public ICollection<Problema> Problemas { get; set; } = new List<Problema>();
         public ICollection<Solucion> Soluciones { get; set; } = new List<Solucion>();
 
         public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();

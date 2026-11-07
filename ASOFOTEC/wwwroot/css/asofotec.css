@@ -1,0 +1,1066 @@
+/* =====================================================================
+   ASOFOTEC - estilo de la portada, navbar y footer (según el boceto)
+   Colores tomados del diseño:
+     verde principal  var(--as-verde)   verde oscuro  var(--as-verde-osc)
+     azul petróleo    var(--as-teal)   texto oscuro   var(--as-texto)
+   ===================================================================== */
+
+body.pagina-bienvenida {
+    background: var(--as-fondo);
+}
+
+/* ---------- Botones de la marca ---------- */
+
+.btn-as {
+    background: var(--as-verde);
+    border: 1px solid var(--as-verde);
+    color: #fff;
+    font-weight: 600;
+}
+
+.btn-as:hover,
+.btn-as:focus {
+    background: var(--as-verde-osc);
+    border-color: var(--as-verde-osc);
+    color: #fff;
+}
+
+.btn-as-outline {
+    background: var(--as-superficie);
+    border: 1px solid var(--as-verde);
+    color: var(--as-verde-texto);
+    font-weight: 600;
+}
+
+.btn-as-outline:hover,
+.btn-as-outline:focus {
+    background: var(--as-verde);
+    color: #fff;
+}
+
+.btn-as-lg {
+    padding: 0.7rem 1.5rem;
+    border-radius: 0.5rem;
+}
+
+/* ---------- Navbar ---------- */
+
+.as-nav {
+    background: var(--as-superficie);
+    border-bottom: 1px solid var(--as-borde);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+    padding: 0.6rem 0;
+}
+
+.as-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    margin-right: 1rem;
+}
+
+.as-brand img {
+    height: 44px;
+    width: auto;
+}
+
+.as-brand-texto {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.as-brand-texto strong {
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--as-tinta);
+}
+
+.as-brand-texto small {
+    display: none;
+    font-size: 0.66rem;
+    color: var(--as-texto-suave);
+}
+
+@media (min-width: 576px) {
+    .as-brand-texto small {
+        display: block;
+    }
+}
+
+.as-nav-links .nav-link {
+    position: relative;
+    color: var(--as-texto);
+    padding: 0.55rem 0.85rem;
+}
+
+.as-nav-links .nav-link:hover {
+    color: var(--as-verde-texto);
+}
+
+.as-nav-links .nav-link.active {
+    color: var(--as-verde-texto);
+    font-weight: 600;
+}
+
+/* Subrayado verde del enlace activo (solo en escritorio) */
+@media (min-width: 1200px) {
+    .as-nav-links .nav-link.active::after {
+        content: "";
+        position: absolute;
+        left: 0.85rem;
+        right: 0.85rem;
+        bottom: 0;
+        height: 2px;
+        background: var(--as-verde);
+    }
+}
+
+/* Menú desplegable en móvil / tablet */
+@media (max-width: 1199.98px) {
+    .as-nav .navbar-collapse {
+        padding-top: 0.75rem;
+    }
+
+    .as-nav-links .nav-link.active {
+        background: var(--as-verde-claro);
+        border-radius: 0.5rem;
+    }
+}
+
+.as-nav .navbar-toggler {
+    border-color: var(--as-borde);
+}
+
+.as-nav .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(33, 108, 69, 0.25);
+}
+
+.as-buscar-btn {
+    color: var(--as-texto);
+    background: none;
+    border: 0;
+    font-size: 1.2rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.as-buscar-btn:hover {
+    color: var(--as-verde-texto);
+}
+
+.as-buscar-menu {
+    min-width: min(320px, 90vw);
+    padding: 0.75rem;
+}
+
+.nav-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 0.65rem;
+    background: var(--as-verde);
+}
+
+/* ---------- Portada: hero ---------- */
+
+.as-hero {
+    position: relative;
+    background: var(--as-superficie);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+}
+
+.as-hero-texto {
+    position: relative;
+    z-index: 2;
+    padding: 1.75rem 1.25rem 0.5rem;
+}
+
+.as-hero h1 {
+    font-size: clamp(2rem, 7vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--as-tinta);
+    margin-bottom: 1rem;
+}
+
+.as-hero h1 span {
+    display: block;
+    color: var(--as-verde-texto);
+}
+
+.as-hero-texto p {
+    font-size: 1.05rem;
+    color: var(--as-texto);
+    max-width: 34rem;
+    margin-bottom: 1.5rem;
+}
+
+.as-hero-texto p strong {
+    color: var(--as-verde-texto);
+}
+
+.as-hero-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.as-hero-botones .btn {
+    flex: 1 1 100%;
+}
+
+@media (min-width: 576px) {
+    .as-hero-botones .btn {
+        flex: 0 0 auto;
+    }
+}
+
+/* Foto: en móvil va debajo del texto y se difumina hacia arriba */
+.as-hero-imagen {
+    position: relative;
+    height: 230px;
+    margin-top: 0.75rem;
+}
+
+.as-hero-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 38%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 38%);
+}
+
+/* Escritorio: foto a la derecha, difuminada hacia el texto */
+@media (min-width: 992px) {
+    .as-hero {
+        display: flex;
+        align-items: center;
+        min-height: 340px;
+    }
+
+    .as-hero-texto {
+        width: 52%;
+        padding: 2.5rem 0 4.5rem 2.75rem;
+    }
+
+    .as-hero-imagen {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 58%;
+        height: auto;
+        margin: 0;
+    }
+
+    .as-hero-imagen img {
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 45%);
+        mask-image: linear-gradient(to right, transparent 0, #000 45%);
+    }
+}
+
+/* ---------- Portada: franja de beneficios ---------- */
+
+.as-beneficios {
+    position: relative;
+    z-index: 3;
+    background: var(--as-superficie);
+    border-radius: 1.25rem;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    padding: 1.25rem;
+    margin: -1.25rem 0.5rem 1.5rem;
+}
+
+@media (min-width: 992px) {
+    .as-beneficios {
+        padding: 1.5rem 1rem;
+        margin: -3.25rem 1rem 1.5rem;
+    }
+
+    .as-beneficios .col:not(:last-child) {
+        border-right: 1px solid var(--as-borde);
+    }
+}
+
+.as-beneficio {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.as-beneficio h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--as-tinta);
+    margin-bottom: 0.15rem;
+}
+
+.as-beneficio p {
+    font-size: 0.88rem;
+    color: var(--as-texto-suave);
+    margin: 0;
+}
+
+.as-icono-circulo {
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--as-verde-claro);
+    color: var(--as-verde-texto);
+    font-size: 1.7rem;
+}
+
+/* ---------- Portada: tarjetas de contenido ---------- */
+
+.as-tarjeta {
+    height: 100%;
+    border-radius: 1.25rem;
+    padding: 1.25rem 1.25rem 0.75rem;
+}
+
+.as-tarjeta-problemas { background: var(--as-tinte-problemas); }
+.as-tarjeta-soluciones { background: var(--as-tinte-soluciones); }
+.as-tarjeta-unete { background: var(--as-tinte-unete); }
+
+.as-tarjeta-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+}
+
+.as-tarjeta h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--as-titulo);
+    margin: 0;
+}
+
+.as-soluciones-titulo { color: var(--as-calido-titulo); }
+
+.as-ver-todos {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--as-verde-texto);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.as-ver-todos:hover { text-decoration: underline; }
+
+.as-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.as-item:last-child { border-bottom: 0; }
+
+.as-item-miniatura {
+    flex: 0 0 auto;
+    width: 92px;
+    height: 62px;
+    border-radius: 0.6rem;
+    object-fit: cover;
+    background: var(--as-superficie-2);
+    color: var(--as-texto-suave);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.as-item-icono {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    border-radius: 0.6rem;
+    background: var(--as-calido-bg);
+    color: var(--as-calido-fg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+}
+
+.as-item-icono.es-elegida { background: var(--as-verde-claro); color: var(--as-verde-texto); }
+
+.as-item-cuerpo {
+    min-width: 0;
+    flex: 1;
+}
+
+.as-item-titulo {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-weight: 600;
+    font-size: 0.92rem;
+    line-height: 1.3;
+    color: var(--as-texto);
+    text-decoration: none;
+}
+
+a.as-item-titulo:hover { color: var(--as-verde-texto); }
+
+.as-item-linea {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.15rem 0.75rem;
+    margin-top: 0.2rem;
+    font-size: 0.78rem;
+    color: var(--as-texto-suave);
+}
+
+.as-item-categoria { color: var(--as-verde-texto); font-weight: 600; }
+
+.as-item-datos {
+    display: flex;
+    gap: 0.75rem;
+    color: var(--as-texto);
+}
+
+.as-tarjeta-unete img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0.25rem 0 0.75rem;
+}
+
+.as-tarjeta-unete p {
+    color: var(--as-texto);
+    font-size: 0.95rem;
+}
+
+/* ---------- Portada: estadísticas ---------- */
+
+.as-stats {
+    background: var(--as-teal);
+    color: #fff;
+    border-radius: 1.25rem;
+    padding: 1.25rem 1rem;
+}
+
+@media (min-width: 992px) {
+    .as-stats .col:not(:last-child) {
+        border-right: 1px solid rgba(255, 255, 255, 0.18);
+    }
+}
+
+.as-stat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+}
+
+.as-stat i {
+    font-size: 2.1rem;
+    opacity: 0.9;
+}
+
+.as-stat strong {
+    display: block;
+    font-size: 1.75rem;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.as-stat span {
+    font-size: 0.88rem;
+    opacity: 0.85;
+}
+
+/* ---------- Páginas internas del menú ---------- */
+
+.as-pagina-titulo {
+    font-weight: 800;
+    color: var(--as-tinta);
+}
+
+.as-tarjeta-simple {
+    background: var(--as-superficie);
+    border-radius: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 1.25rem;
+    height: 100%;
+}
+
+.as-paso-num {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--as-verde);
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------- Footer ---------- */
+
+.as-footer {
+    background: var(--as-superficie);
+    border-top: 1px solid var(--as-borde);
+    margin-top: 2.5rem;
+}
+
+.as-footer .as-brand img { height: 36px; }
+.as-footer .as-brand-texto strong { font-size: 1.15rem; }
+.as-footer .as-brand-texto small { display: block; }
+
+.as-redes {
+    display: flex;
+    gap: 1rem;
+    font-size: 1.4rem;
+}
+
+.as-redes a {
+    color: var(--as-texto);
+    transition: color 0.15s;
+}
+
+.as-redes a:hover { color: var(--as-verde-texto); }
+
+/* ---------- Estructura general y barra inferior móvil ---------- */
+
+body.tiene-bottom-nav {
+    margin-bottom: 0;
+}
+
+@media (max-width: 991.98px) {
+    /* Espacio para que la barra inferior fija no tape el footer */
+    body.tiene-bottom-nav {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom));
+    }
+}
+
+
+/* ---------- Fotos de perfil y portada ---------- */
+
+.avatar-img {
+    object-fit: cover;
+    background: var(--as-borde);
+}
+
+/* Tarjeta de perfil del feed */
+.perfil-mini-portada {
+    height: 70px;
+    background-color: var(--as-verde);
+    background-image: linear-gradient(120deg, var(--as-lima), var(--as-teal));
+    background-size: cover;
+    background-position: center;
+}
+
+.perfil-mini-avatar {
+    width: 64px;
+    height: 64px;
+    margin-top: -32px;
+    border-radius: 50%;
+    border: 3px solid var(--as-superficie);
+    background: var(--as-superficie);
+    overflow: hidden;
+}
+
+.perfil-mini-avatar .feed-avatar-lg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Página "Mi perfil" */
+.perfil-portada {
+    position: relative;
+    height: 180px;
+    border-radius: 1rem 1rem 0 0;
+    background-color: var(--as-verde);
+    background-image: linear-gradient(120deg, var(--as-lima), var(--as-teal));
+    background-size: cover;
+    background-position: center;
+}
+
+@media (min-width: 768px) {
+    .perfil-portada { height: 240px; }
+}
+
+.perfil-portada-acciones {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: flex;
+    gap: 0.4rem;
+}
+
+.perfil-cabecera {
+    background: var(--as-superficie);
+    border-radius: 0 0 1rem 1rem;
+    padding: 0 1rem 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.perfil-avatar-caja {
+    position: relative;
+    width: 112px;
+    height: 112px;
+    margin-top: -56px;
+}
+
+.perfil-avatar {
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    border: 4px solid var(--as-superficie);
+    background: var(--as-superficie);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.perfil-avatar .feed-avatar-lg {
+    width: 100%;
+    height: 100%;
+    font-size: 2.2rem;
+}
+
+.perfil-avatar-camara {
+    position: absolute;
+    right: -2px;
+    bottom: 2px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2px solid var(--as-superficie);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Registro */
+.edad-calculada {
+    font-size: 0.85rem;
+}
+
+/* Panel DBA */
+.dba-metrica {
+    background: var(--as-superficie);
+    border-radius: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+    height: 100%;
+}
+
+.dba-metrica strong {
+    display: block;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    color: var(--as-tinta);
+}
+
+.dba-metrica span {
+    font-size: 0.85rem;
+    color: var(--as-texto-suave);
+}
+
+.tabla-dba th {
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+
+/* ---------- Campana de notificaciones ---------- */
+
+.notif-btn {
+    position: relative;
+    background: none;
+    border: 0;
+    color: var(--as-texto);
+    font-size: 1.35rem;
+    line-height: 1;
+    padding: 0.45rem 0.6rem;
+    border-radius: 50%;
+}
+
+.notif-btn:hover {
+    background: var(--as-superficie-2);
+    color: var(--as-verde-texto);
+}
+
+.notif-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--as-peligro);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+}
+
+.notif-menu {
+    width: 380px;
+    max-width: 94vw;
+}
+
+.notif-lista {
+    max-height: min(420px, 60vh);
+    overflow-y: auto;
+}
+
+.notif-item {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.7rem 1rem;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--as-borde);
+}
+
+.notif-item:last-child { border-bottom: 0; }
+.notif-item:hover { background: var(--as-superficie-2); }
+.notif-item.no-leida { background: var(--as-verde-claro); }
+.notif-item.no-leida:hover { background: var(--as-verde-claro); }
+
+.notif-avatar {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+/* Icono pequeño que indica el tipo de aviso */
+.notif-tipo {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--as-superficie);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: #fff;
+    background: var(--as-verde);
+}
+
+.notif-tipo-comentario,
+.notif-tipo-respuesta { background: var(--as-info); }
+.notif-tipo-seguidor { background: var(--as-seguidor); }
+.notif-tipo-solucion { background: var(--as-alerta); }
+
+.notif-cuerpo {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-size: 0.86rem;
+    line-height: 1.3;
+}
+
+.notif-extracto {
+    color: var(--as-texto-suave);
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notif-fecha {
+    color: var(--as-verde-texto);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.notif-punto {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    margin-top: 0.35rem;
+    border-radius: 50%;
+    background: var(--as-verde);
+}
+
+/* ---------- Compartir y personas ---------- */
+
+.btn-compartir-nativo-item {
+    display: none;
+}
+
+.soporta-share .btn-compartir-nativo-item {
+    display: block;
+}
+
+.persona-item + .persona-item {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+
+/* ---------- Chat ---------- */
+
+.msg-btn {
+    text-decoration: none;
+    display: inline-block;
+}
+
+/* En el chat no hace falta el pie de página y se aprovecha toda la altura */
+body.pagina-chat .as-footer {
+    display: none;
+}
+
+.chat-app {
+    display: flex;
+    background: var(--as-superficie);
+    border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    /* navbar + barra inferior móvil + márgenes */
+    height: calc(100vh - 200px);
+    height: calc(100dvh - 200px);
+    min-height: 420px;
+}
+
+@media (min-width: 992px) {
+    .chat-app {
+        height: calc(100dvh - 140px);
+        max-height: 780px;
+    }
+}
+
+.chat-lista-panel {
+    flex-direction: column;
+    width: 100%;
+    border-right: 1px solid var(--as-borde);
+}
+
+@media (min-width: 992px) {
+    .chat-lista-panel {
+        width: 340px;
+        flex: 0 0 340px;
+    }
+}
+
+.chat-lista-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--as-borde);
+}
+
+.chat-lista {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.7rem 1rem;
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid var(--as-borde);
+}
+
+.chat-item:hover { background: var(--as-superficie-2); }
+.chat-item.activa { background: var(--as-verde-claro); }
+
+.chat-item-cuerpo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.chat-item-linea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.86rem;
+}
+
+.chat-item-hora {
+    flex: 0 0 auto;
+    font-size: 0.72rem;
+    color: var(--as-texto-suave);
+}
+
+.chat-item-texto {
+    color: var(--as-texto-suave);
+    font-size: 0.82rem;
+}
+
+.chat-item-badge {
+    flex: 0 0 auto;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: var(--as-verde);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+}
+
+.chat-conv-panel {
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.chat-conv-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid var(--as-borde);
+}
+
+.chat-mensajes {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    background: var(--as-superficie-2);
+}
+
+.chat-msg {
+    display: flex;
+    margin-bottom: 0.3rem;
+}
+
+.chat-msg.mio { justify-content: flex-end; }
+
+.chat-burbuja {
+    max-width: 80%;
+    padding: 0.4rem 0.7rem 0.3rem;
+    border-radius: 1rem;
+    background: var(--as-superficie);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.chat-msg.otro .chat-burbuja { border-bottom-left-radius: 0.3rem; }
+
+.chat-msg.mio .chat-burbuja {
+    background: var(--as-burbuja-mio);
+    border-bottom-right-radius: 0.3rem;
+}
+
+.chat-texto {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 0.93rem;
+}
+
+.chat-meta {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.1rem;
+    font-size: 0.68rem;
+    color: var(--as-texto-suave);
+}
+
+.chat-visto { font-size: 0.85rem; }
+.chat-visto.visto { color: var(--as-info); }
+
+.chat-dia {
+    text-align: center;
+    margin: 0.8rem 0 0.5rem;
+}
+
+.chat-dia span {
+    display: inline-block;
+    padding: 0.15rem 0.7rem;
+    border-radius: 1rem;
+    background: var(--as-borde);
+    color: var(--as-texto-suave);
+    font-size: 0.72rem;
+    text-transform: capitalize;
+}
+
+.chat-escribiendo {
+    padding: 0.25rem 1rem;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--as-verde-texto);
+    background: var(--as-superficie-2);
+}
+
+.chat-pie {
+    padding: 0.6rem;
+    border-top: 1px solid var(--as-borde);
+    background: var(--as-superficie);
+}
+
+.chat-input {
+    resize: none;
+    max-height: 120px;
+    border-radius: 1.2rem;
+}
+
+.btn-enviar-chat {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.chat-bloqueado {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.86rem;
+    color: var(--as-texto-suave);
+    text-align: center;
+}
+
+.chat-vacio {
+    flex: 1;
+    overflow-y: auto;
+    text-align: center;
+    padding: 2rem 1.25rem;
+}
+
+.chat-amigos {
+    max-width: 380px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.chat-amigo {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.5rem 0.4rem;
+    border-radius: 0.6rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.chat-amigo:hover { background: var(--as-superficie-2); }

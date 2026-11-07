@@ -1,138 +1,603 @@
 ﻿@using ASOFOTEC.Dtos
 @model ProblemaDetailsDto
 
+@{
+    var problema = Model.Problema;
+    var ruta = Model.Ruta;
+    ViewData["Title"] = problema.Titulo;
 
+    // Id del usuario con sesión iniciada (null si es un visitante)
+    var usuarioActualId = Context.ObtenerUsuarioId();
+    var volverA = Context.Request.Path + Context.Request.QueryString;
 
-<div class="container mt-5">
-    <!--Problema-->
-    <div class="card shadow-sm border-0 p-4 mb-4">
-        <span class="badge bg-success mb-2">
-            @Model.Problema.Categoria
-        </span>
-        <h2>@Model.Problema.Titulo</h2>
-        <p class="text-muted mt-3">
-            @Model.Problema.Descripcion
-        </p>
-        <small class="text-secondary">
-            Publicado el : @Model.Problema.Fecha_Creacion.ToShortDateString()
-        </small>
-         
-    </div>
-    <!--Formulario Para Solución-->
-    <div class="card shadow-sm border-0 p-4 mb-4">
-        <h5>Proponer una Solución</h5>
-        <form asp-action="CrearSolucion" method="post">
-            @Html.AntiForgeryToken()
+    // Paso que se abre al entrar y siguiente paso sugerido
+    var pasoInicial = Model.PasoInicial;
+    var siguiente = ruta.SiguientePaso();
+    var colorEstado = RutaProblemaHelper.Color(ruta.Etapa);
 
-            <input type="hidden" asp-for="NuevaSolucion.ProblemaId" />
+    string ClasePanel(int n) => pasoInicial == n ? "show active" : "";
 
-            <div class="mb-3">
-                <textarea asp-for="NuevaSolucion.Descripcion"
-                          class="form-control"
-                          rows="4"></textarea>
-            </div>
+    // Compartir el problema por enlace + vista previa en WhatsApp / Facebook
+    var enlaceProblema = Url.Action("Details", "Problema", new { id = problema.Id }, Context.Request.Scheme)!;
+    var compartirProblema = new CompartirVm { Url = enlaceProblema, Titulo = problema.Titulo ?? "Problema en ASOFOTEC", Clase = "btn btn-sm btn-outline-success" };
+    ViewData["OgTitulo"] = problema.Titulo;
+    ViewData["OgDescripcion"] = FeedHelper.Resumir(problema.Descripcion, 160);
+    ViewData["OgUrl"] = enlaceProblema;
+    if (!string.IsNullOrEmpty(problema.ImageUrl))
+    {
+        ViewData["OgImagen"] = $"{Context.Request.Scheme}://{Context.Request.Host}{problema.ImageUrl}";
+    }
 
-            <button type="submit" class="btn btn-primary">
-                Enviar Solución
-            </button>
-        </form>
-    </div>
-    <!--Listado de Soluciones-->
-    <div>
-        <h4 class="mb-3">Soluciones</h4>
-        @if (!Model.Soluciones.Any())
-        {
-            <div class="alert alert-info">
-                No hay soluciones! Puedes ser el primero en aportar.
-            </div>
-        }
-        else
-        {
-            @foreach (var solucion in Model.Soluciones)
+    // Colores de las etiquetas de comparación (para impacto, más es mejor; para costo, menos es mejor)
+    string ClaseNivel(string? valor, bool masEsMejor) => valor switch
+    {
+        "Alto" => masEsMejor ? "text-bg-success" : "text-bg-danger",
+        "Medio" => "text-bg-warning",
+        "Bajo" => masEsMejor ? "text-bg-secondary" : "text-bg-success",
+        _ => "text-bg-light border"
+    };
+}
+
+<div class="container mt-4 ruta-problema">
+
+    <!-- Encabezado del problema -->
+    <div class="card shadow-sm border-0 p-3 p-md-4 mb-3">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <span class="badge bg-success">@problema.Categoria</span>
+            <span class="badge text-bg-@colorEstado">@RutaProblemaHelper.NombreEstado(ruta.Etapa)</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-start gap-2">
+            <h1 class="h3 mb-1">@problema.Titulo</h1>
+            <partial name="_Compartir" model="compartirProblema" />
+        </div>
+        <small class="text-muted">
+            @if (!string.IsNullOrWhiteSpace(problema.UsuarioNombre))
             {
-                <div class="card mb-3 shadow-sm border-0">
-                    <div class="card-body">
-                        <p>
-                          @solucion.Descripcion
-                        </p>
-                        <div class="d-flex justify-content-between">
-                            <span class="badge bg-secondary">
-                                @solucion.Estado
-                            </span>
-                            <small class="text-muted"
-                            >@solucion.Fecha_Solucion.ToShortDateString()</small>
+                <span>Publicado por <strong>@problema.UsuarioNombre</strong> · </span>
+            }
+            @problema.Fecha_Creacion.ToShortDateString()
+        </small>
+    </div>
 
-                            <div class="d-flex align-items-center gap-3 mt-3">
-                                <button class="btn-like btn btn-sm btn-outline-primary"
-                                        data-solucion-id="@solucion.Id">
-                                    👍 <span class="like-count">@solucion.TotalLikes</span>
-                                </button>
-                                <span class="text-muted">
-                                    💬 @solucion.TotalComentarios
-                                </span>
+    <!-- Ruta del problema: 7 pasos, cada uno abre su panel -->
+    <div class="ruta-stepper-wrap mb-3">
+        <div class="nav ruta-stepper" role="tablist" aria-label="Ruta del problema">
+            @for (var i = 1; i <= RutaProblemaHelper.TotalPasos; i++)
+            {
+                var estadoPaso = i < ruta.Etapa ? "hecho" : (i == ruta.Etapa ? "actual" : "pendiente");
+                // El paso 2 es opcional: si se avanzó sin documentarlo se muestra como omitido
+                if (i == 2 && i < ruta.Etapa && !ruta.CausasDocumentadas) { estadoPaso = "omitido"; }
+
+                <button type="button"
+                        class="ruta-paso paso-@estadoPaso @(pasoInicial == i ? "active" : "")"
+                        id="tab-paso-@i"
+                        data-bs-toggle="pill"
+                        data-bs-target="#paso-@i"
+                        role="tab"
+                        aria-controls="paso-@i"
+                        aria-selected="@(pasoInicial == i ? "true" : "false")">
+                    <span class="ruta-paso-circulo">
+                        @if (estadoPaso == "hecho") { <i class="bi bi-check-lg"></i> } else { <text>@i</text> }
+                    </span>
+                    <span class="ruta-paso-nombre">@RutaProblemaHelper.Pasos[i - 1]</span>
+                </button>
+            }
+        </div>
+        <div class="progress ruta-progreso" role="progressbar" aria-label="Avance de la ruta"
+             aria-valuenow="@RutaProblemaHelper.Porcentaje(ruta.Etapa)" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar bg-@colorEstado" style="width:@(RutaProblemaHelper.Porcentaje(ruta.Etapa))%"></div>
+        </div>
+    </div>
+
+    <!-- Qué sigue (se calcula según el estado del problema y quién lo mira) -->
+    <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between gap-2 py-2">
+        <div>
+            <i class="bi bi-signpost-split me-2"></i><strong>Siguiente paso:</strong> @siguiente.Mensaje
+        </div>
+        <button type="button" class="btn btn-sm btn-success btn-ir-paso" data-paso="@siguiente.Paso">
+            Ir al paso @siguiente.Paso
+        </button>
+    </div>
+
+    <div class="tab-content">
+
+        <!-- ============ 1. Describir el problema ============ -->
+        <div class="tab-pane fade @ClasePanel(1)" id="paso-1" role="tabpanel" aria-labelledby="tab-paso-1" tabindex="0">
+            <div class="ruta-panel">
+                <h2 class="h5 mb-3">1. Describir el problema</h2>
+                @if (!string.IsNullOrEmpty(problema.ImageUrl))
+                {
+                    <img src="@problema.ImageUrl" class="feed-img mb-3" style="max-height:340px" alt="Imagen del problema" />
+                }
+                <p class="feed-text mb-0">@problema.Descripcion</p>
+            </div>
+        </div>
+
+        <!-- ============ 2. Causas y consecuencias ============ -->
+        <div class="tab-pane fade @ClasePanel(2)" id="paso-2" role="tabpanel" aria-labelledby="tab-paso-2" tabindex="0">
+            <div class="ruta-panel">
+                <h2 class="h5 mb-1">2. Documentar causas y consecuencias</h2>
+                <p class="text-muted small mb-3">Entender por qué ocurre un problema y qué provoca ayuda a proponer mejores soluciones.</p>
+
+                @if (ruta.EsDueno)
+                {
+                    <form asp-controller="Ruta" asp-action="GuardarAnalisis" method="post">
+                        <input type="hidden" name="problemaId" value="@problema.Id" />
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="causas">Causas</label>
+                                <textarea id="causas" name="causas" class="form-control" rows="5" maxlength="1000"
+                                          placeholder="¿Por qué ocurre este problema?">@ruta.Causas</textarea>
                             </div>
-
-                            <hr />
-
-                            <div class="comentarios-container">
-
-                                <h6>
-                                    Comentarios
-                                    <span id="contador-@solucion.Id">
-                                        (@solucion.TotalComentarios)
-                                    </span>
-                                </h6>
-
-                                <form asp-controller="Comentario" asp-action="CrearComentario" method="post" class="mb-3">
-                                    <input type="hidden" name="SolucionId" value="@solucion.Id" />
-                                    <textarea name="Contenido" class="form-control" rows="2" maxlength="300" required
-                                              placeholder="Escribe un comentario..."></textarea>
-                                    <div class="text-end mt-2">
-                                        <button type="submit" class="btn btn-success">Comentar</button>
-                                    </div>
-                                </form>
-
-                                <div id="comentarios-@solucion.Id">
-                                    @foreach (var c in solucion.comentarios)
-                                    {
-                                        <div class="border-bottom py-2">
-                                            <strong>@c.UserName</strong>
-                                            <small class="text-muted">@c.FechaComentario.ToString("g")</small>
-                                            <p class="mb-0">@c.contenido</p>
-                                        </div>
-                                    }
-                                </div>
-
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold" for="consecuencias">Consecuencias</label>
+                                <textarea id="consecuencias" name="consecuencias" class="form-control" rows="5" maxlength="1000"
+                                          placeholder="¿A quiénes afecta y cómo?">@ruta.Consecuencias</textarea>
                             </div>
-
-                            <!-- BOTÓN ELIMINAR -->
-                            <form asp-controller="Solucion"
-                                  asp-action="Delete"
-                                  method="post"
-                                  onsubmit="return confirm('¿Deseas eliminar esta solución?');">
-
-                                @Html.AntiForgeryToken()
-
-                                <input type="hidden"
-                                       name="id"
-                                       value="@solucion.Id" />
-
-                                <button type="submit"
-                                        class="btn btn-sm btn-outline-danger">
-                                    Eliminar
-                                </button>
-
-                            </form>
-
+                        </div>
+                        <button type="submit" class="btn btn-success mt-3">Guardar</button>
+                    </form>
+                }
+                else
+                {
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <h3 class="h6">Causas</h3>
+                            @if (string.IsNullOrWhiteSpace(ruta.Causas)) { <p class="text-muted small mb-0">Aún no se han documentado.</p> }
+                            else { <p class="feed-text mb-0">@ruta.Causas</p> }
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="h6">Consecuencias</h3>
+                            @if (string.IsNullOrWhiteSpace(ruta.Consecuencias)) { <p class="text-muted small mb-0">Aún no se han documentado.</p> }
+                            else { <p class="feed-text mb-0">@ruta.Consecuencias</p> }
                         </div>
                     </div>
-                </div>
-            }
-        }
+                }
+            </div>
+        </div>
+
+        <!-- ============ 3. Proponer soluciones ============ -->
+        <div class="tab-pane fade @ClasePanel(3)" id="paso-3" role="tabpanel" aria-labelledby="tab-paso-3" tabindex="0">
+            <div class="ruta-panel">
+                <h2 class="h5 mb-3">3. Proponer diferentes soluciones</h2>
+
+                @if (ruta.Resuelto)
+                {
+                    <div class="alert alert-secondary small">Este problema ya está resuelto, por eso no recibe nuevas propuestas.</div>
+                }
+                else if (usuarioActualId.HasValue)
+                {
+                    <form asp-action="CrearSolucion" method="post" class="mb-4">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="NuevaSolucion.ProblemaId" />
+
+                        <div class="mb-2">
+                            <textarea asp-for="NuevaSolucion.Descripcion" class="form-control" rows="3" maxlength="300"
+                                      placeholder="Describe tu propuesta (máx. 300 caracteres)" required></textarea>
+                        </div>
+
+                        <p class="text-muted small mb-1">Opcional: estos datos permiten comparar tu propuesta con las demás.</p>
+                        <div class="row g-2">
+                            <div class="col-6 col-md-3">
+                                <label class="form-label small mb-0" for="NuevaSolucion_Impacto">Impacto</label>
+                                <select asp-for="NuevaSolucion.Impacto" class="form-select form-select-sm">
+                                    <option value="">Sin definir</option>
+                                    <option value="Bajo">Bajo</option>
+                                    <option value="Medio">Medio</option>
+                                    <option value="Alto">Alto</option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label class="form-label small mb-0" for="NuevaSolucion_Costo">Costo</label>
+                                <select asp-for="NuevaSolucion.Costo" class="form-select form-select-sm">
+                                    <option value="">Sin definir</option>
+                                    <option value="Bajo">Bajo</option>
+                                    <option value="Medio">Medio</option>
+                                    <option value="Alto">Alto</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label class="form-label small mb-0" for="NuevaSolucion_TiempoEstimado">Tiempo estimado</label>
+                                <input asp-for="NuevaSolucion.TiempoEstimado" class="form-control form-control-sm"
+                                       maxlength="60" placeholder="Ej. 3 meses" />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-3">Enviar solución</button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-light border small">
+                        <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@volverA">Inicia sesión</a>
+                        para proponer una solución.
+                    </div>
+                }
+
+                <h3 class="h6 mb-3">Propuestas (@Model.Soluciones.Count)</h3>
+
+                @if (!Model.Soluciones.Any())
+                {
+                    <div class="alert alert-info mb-0">No hay soluciones todavía. ¡Puedes ser el primero en aportar!</div>
+                }
+
+                @foreach (var solucion in Model.Soluciones)
+                {
+                    var esAutorSolucion = usuarioActualId.HasValue && usuarioActualId.Value == solucion.UsuarioId;
+                    var panelComentarios = new PanelComentariosVm
+                    {
+                        Campo = "SolucionId",
+                        DestinoId = solucion.Id,
+                        Comentarios = solucion.comentarios
+                    };
+
+                    <div class="card card-solucion mb-3 shadow-sm border-0 @(solucion.Seleccionada ? "border-start border-success border-4" : "")">
+                        <div class="card-body">
+
+                            <!-- Encabezado: autor, fecha y estado -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    @if (!string.IsNullOrWhiteSpace(solucion.UsuarioNombre))
+                                    {
+                                        <strong class="d-block">@solucion.UsuarioNombre</strong>
+                                    }
+                                    <small class="text-muted">@solucion.Fecha_Solucion.ToShortDateString()</small>
+                                </div>
+                                <span class="badge @(solucion.Seleccionada ? "bg-success" : "bg-secondary")">@solucion.Estado</span>
+                            </div>
+
+                            <p class="mb-2 feed-text">@solucion.Descripcion</p>
+
+                            @if (!string.IsNullOrEmpty(solucion.Impacto) || !string.IsNullOrEmpty(solucion.Costo) || !string.IsNullOrEmpty(solucion.TiempoEstimado))
+                            {
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    @if (!string.IsNullOrEmpty(solucion.Impacto))
+                                    {
+                                        <span class="badge @ClaseNivel(solucion.Impacto, true)">Impacto: @solucion.Impacto</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(solucion.Costo))
+                                    {
+                                        <span class="badge @ClaseNivel(solucion.Costo, false)">Costo: @solucion.Costo</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(solucion.TiempoEstimado))
+                                    {
+                                        <span class="badge text-bg-light border"><i class="bi bi-clock"></i> @solucion.TiempoEstimado</span>
+                                    }
+                                </div>
+                            }
+
+                            <!-- Acciones: me gusta, comentarios y eliminar -->
+                            <div class="d-flex align-items-center gap-2 pt-2 border-top">
+                                <button type="button" class="btn-like btn btn-sm @(solucion.UsuarioDioLike ? "btn-success" : "btn-outline-success")"
+                                        data-solucion-id="@solucion.Id" title="Me gusta" aria-label="Me gusta">
+                                    <i class="bi @(solucion.UsuarioDioLike ? "bi-hand-thumbs-up-fill" : "bi-hand-thumbs-up")"></i>
+                                    <span class="like-count">@solucion.TotalLikes</span>
+                                </button>
+
+                                <button class="btn btn-sm btn-outline-success btn-toggle-comentarios"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#panel-comentarios-sol-@solucion.Id"
+                                        aria-expanded="false"
+                                        aria-controls="panel-comentarios-sol-@solucion.Id"
+                                        title="Comentarios">
+                                    <i class="bi bi-chat"></i>
+                                    <span class="contador-comentarios">@solucion.TotalComentarios</span>
+                                </button>
+
+                                <!-- Eliminar: solo lo ve el usuario que publicó la solución -->
+                                @if (esAutorSolucion || Context.EsDba())
+                                {
+                                    <form asp-controller="Solucion" asp-action="Delete" method="post" class="ms-auto"
+                                          data-confirm="¿Deseas eliminar esta solución? Se borrarán también sus comentarios.">
+                                        <input type="hidden" name="id" value="@solucion.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i> Eliminar
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+
+                            <partial name="_PanelComentarios" model="panelComentarios" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- ============ 4. Comparar las propuestas ============ -->
+        <div class="tab-pane fade @ClasePanel(4)" id="paso-4" role="tabpanel" aria-labelledby="tab-paso-4" tabindex="0">
+            <div class="ruta-panel">
+                <h2 class="h5 mb-1">4. Comparar las propuestas</h2>
+                <p class="text-muted small mb-3">
+                    Compara impacto, costo, tiempo y apoyo de la comunidad.
+                    @if (ruta.EsDueno) { <span>Como creador del problema, tú eliges la solución que se ejecutará.</span> }
+                </p>
+
+                @if (!Model.Soluciones.Any())
+                {
+                    <div class="alert alert-info mb-0">Aún no hay propuestas para comparar.</div>
+                }
+                else
+                {
+                    @if (Model.Soluciones.Count < 2)
+                    {
+                        <p class="text-muted small">Con una sola propuesta no hay mucho que comparar, pero igual se puede elegir.</p>
+                    }
+
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle tabla-comparar mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Propuesta</th>
+                                    <th>Impacto</th>
+                                    <th>Costo</th>
+                                    <th>Tiempo</th>
+                                    <th class="text-center" title="Me gusta"><i class="bi bi-hand-thumbs-up"></i></th>
+                                    <th class="text-center" title="Comentarios"><i class="bi bi-chat"></i></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var s in Model.Soluciones.OrderByDescending(x => x.Seleccionada).ThenByDescending(x => x.TotalLikes))
+                                {
+                                    <tr class="@(s.Seleccionada ? "table-success" : "")">
+                                        <td style="min-width:220px">
+                                            <div class="fw-semibold small">@s.UsuarioNombre</div>
+                                            <div class="small text-muted">@FeedHelper.Resumir(s.Descripcion, 110)</div>
+                                        </td>
+                                        <td>
+                                            @if (string.IsNullOrEmpty(s.Impacto)) { <span class="text-muted">—</span> }
+                                            else { <span class="badge @ClaseNivel(s.Impacto, true)">@s.Impacto</span> }
+                                        </td>
+                                        <td>
+                                            @if (string.IsNullOrEmpty(s.Costo)) { <span class="text-muted">—</span> }
+                                            else { <span class="badge @ClaseNivel(s.Costo, false)">@s.Costo</span> }
+                                        </td>
+                                        <td class="small">@(string.IsNullOrEmpty(s.TiempoEstimado) ? "—" : s.TiempoEstimado)</td>
+                                        <td class="text-center">@s.TotalLikes</td>
+                                        <td class="text-center">@s.TotalComentarios</td>
+                                        <td class="text-end">
+                                            @if (s.Seleccionada)
+                                            {
+                                                <span class="badge bg-success"><i class="bi bi-check-lg"></i> Elegida</span>
+                                            }
+                                            else if (ruta.EsDueno && !ruta.Resuelto)
+                                            {
+                                                <form asp-controller="Ruta" asp-action="SeleccionarSolucion" method="post"
+                                                      data-confirm="¿Elegir esta solución? El equipo empezará a trabajar en ella."
+                                                      data-confirm-titulo="Elegir solución"
+                                                      data-confirm-ok="Elegir"
+                                                      data-confirm-peligro="false">
+                                                    <input type="hidden" name="problemaId" value="@problema.Id" />
+                                                    <input type="hidden" name="solucionId" value="@s.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-success">Elegir</button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- ============ 5. Formar un equipo ============ -->
+        <div class="tab-pane fade @ClasePanel(5)" id="paso-5" role="tabpanel" aria-labelledby="tab-paso-5" tabindex="0">
+            <div class="ruta-panel">
+                <h2 class="h5 mb-3">5. Formar un equipo de colaboradores</h2>
+
+                @if (ruta.Seleccionada == null)
+                {
+                    <div class="ruta-bloqueado">
+                        <i class="bi bi-lock"></i>
+                        <p class="mb-2">Este paso se activa cuando el creador del problema elige una solución.</p>
+                        <button type="button" class="btn btn-sm btn-outline-secondary btn-ir-paso" data-paso="4">Ir a comparar propuestas</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="border rounded p-3 mb-3 bg-light">
+                        <small class="text-muted d-block">Solución elegida</small>
+                        <p class="mb-0 feed-text">@ruta.Seleccionada.Descripcion</p>
+                    </div>
+
+                    <h3 class="h6">Equipo (@ruta.Equipo.Count)</h3>
+                    <ul class="list-unstyled mb-3">
+                        @foreach (var m in ruta.Equipo)
+                        {
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <span class="feed-avatar" aria-hidden="true">@FeedHelper.Iniciales(m.Nombre)</span>
+                                <span>@m.Nombre</span>
+                                @if (m.EsLider) { <span class="badge text-bg-success">Líder</span> }
+                            </li>
+                        }
+                    </ul>
+
+                    @if (!usuarioActualId.HasValue)
+                    {
+                        <div class="alert alert-light border small mb-0">
+                            <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@volverA">Inicia sesión</a> para unirte al equipo.
+                        </div>
+                    }
+                    else if (ruta.Resuelto)
+                    {
+                        <p class="text-muted small mb-0">El equipo ya completó este problema.</p>
+                    }
+                    else if (ruta.EsLider)
+                    {
+                        <p class="text-muted small mb-0">Eres el líder de este equipo porque la solución es tuya.</p>
+                    }
+                    else if (ruta.EsColaborador)
+                    {
+                        <form asp-controller="Ruta" asp-action="Salir" method="post"
+                              data-confirm="¿Quieres salir del equipo?" data-confirm-titulo="Salir del equipo" data-confirm-ok="Salir">
+                            <input type="hidden" name="problemaId" value="@problema.Id" />
+                            <input type="hidden" name="solucionId" value="@ruta.Seleccionada.Id" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Salir del equipo</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <form asp-controller="Ruta" asp-action="Unirse" method="post">
+                            <input type="hidden" name="problemaId" value="@problema.Id" />
+                            <input type="hidden" name="solucionId" value="@ruta.Seleccionada.Id" />
+                            <button type="submit" class="btn btn-success"><i class="bi bi-people me-1"></i>Unirme al equipo</button>
+                        </form>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- ============ 6. Registrar avances ============ -->
+        <div class="tab-pane fade @ClasePanel(6)" id="paso-6" role="tabpanel" aria-labelledby="tab-paso-6" tabindex="0">
+            <div class="ruta-panel">
+                <h2 class="h5 mb-3">6. Registrar los avances de la solución</h2>
+
+                @if (ruta.Seleccionada == null)
+                {
+                    <div class="ruta-bloqueado">
+                        <i class="bi bi-lock"></i>
+                        <p class="mb-2">Los avances se registran cuando ya hay una solución elegida.</p>
+                        <button type="button" class="btn btn-sm btn-outline-secondary btn-ir-paso" data-paso="4">Ir a comparar propuestas</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Progreso de la solución</span>
+                        <strong>@ruta.Progreso%</strong>
+                    </div>
+                    <div class="progress mb-3" role="progressbar" aria-label="Progreso de la solución"
+                         aria-valuenow="@ruta.Progreso" aria-valuemin="0" aria-valuemax="100" style="height:10px">
+                        <div class="progress-bar bg-success" style="width:@(ruta.Progreso)%"></div>
+                    </div>
+
+                    @if (ruta.PuedeGestionar && !ruta.Resuelto)
+                    {
+                        <form asp-controller="Ruta" asp-action="AgregarAvance" method="post" class="mb-4">
+                            <input type="hidden" name="problemaId" value="@problema.Id" />
+                            <input type="hidden" name="solucionId" value="@ruta.Seleccionada.Id" />
+                            <textarea name="contenido" class="form-control mb-2" rows="2" maxlength="500" required
+                                      placeholder="¿Qué lograron? Cuenta el avance"></textarea>
+                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                <div class="input-group input-group-sm" style="max-width:190px">
+                                    <input type="number" name="porcentaje" class="form-control" min="0" max="100"
+                                           placeholder="Avance total" aria-label="Porcentaje de avance total" />
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-sm ms-auto">Registrar avance</button>
+                            </div>
+                        </form>
+                    }
+                    else if (!ruta.Resuelto)
+                    {
+                        <div class="alert alert-light border small">
+                            Solo el equipo y el creador del problema registran avances.
+                            @if (usuarioActualId.HasValue)
+                            {
+                                <button type="button" class="btn btn-link btn-sm p-0 btn-ir-paso" data-paso="5">Únete al equipo</button>
+                            }
+                        </div>
+                    }
+
+                    @if (!ruta.Avances.Any())
+                    {
+                        <p class="text-muted small mb-0">Todavía no hay avances registrados.</p>
+                    }
+
+                    <ul class="ruta-linea list-unstyled mb-0">
+                        @foreach (var a in ruta.Avances)
+                        {
+                            <li class="ruta-linea-item">
+                                <div class="d-flex align-items-start gap-2">
+                                    <div class="flex-grow-1">
+                                        <div class="small">
+                                            <strong>@a.Nombre</strong>
+                                            <span class="text-muted">· @FeedHelper.TiempoRelativo(a.Fecha)</span>
+                                            @if (a.Porcentaje.HasValue) { <span class="badge text-bg-success ms-1">@a.Porcentaje%</span> }
+                                        </div>
+                                        <div class="feed-text">@a.Contenido</div>
+                                    </div>
+
+                                    @if (usuarioActualId.HasValue && usuarioActualId.Value == a.UsuarioId && !ruta.Resuelto)
+                                    {
+                                        <form asp-controller="Ruta" asp-action="EliminarAvance" method="post"
+                                              data-confirm="¿Eliminar este avance?" data-confirm-titulo="Eliminar avance">
+                                            <input type="hidden" name="problemaId" value="@problema.Id" />
+                                            <input type="hidden" name="avanceId" value="@a.Id" />
+                                            <button type="submit" class="btn btn-sm btn-light text-danger" title="Eliminar avance" aria-label="Eliminar avance">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+
+        <!-- ============ 7. Documentar resultados ============ -->
+        <div class="tab-pane fade @ClasePanel(7)" id="paso-7" role="tabpanel" aria-labelledby="tab-paso-7" tabindex="0">
+            <div class="ruta-panel">
+                <h2 class="h5 mb-3">7. Documentar los resultados</h2>
+
+                @if (ruta.Seleccionada == null)
+                {
+                    <div class="ruta-bloqueado">
+                        <i class="bi bi-lock"></i>
+                        <p class="mb-2">Los resultados se documentan cuando la solución elegida termina.</p>
+                        <button type="button" class="btn btn-sm btn-outline-secondary btn-ir-paso" data-paso="4">Ir a comparar propuestas</button>
+                    </div>
+                }
+                else if (ruta.Resuelto)
+                {
+                    <div class="border border-success rounded p-3 bg-success-subtle">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-patch-check-fill text-success fs-4"></i>
+                            <div>
+                                <strong>Problema resuelto</strong>
+                                @if (ruta.FechaResultados.HasValue)
+                                {
+                                    <small class="text-muted d-block">@ruta.FechaResultados.Value.ToShortDateString()</small>
+                                }
+                            </div>
+                        </div>
+                        <p class="feed-text mb-2">@ruta.Resultados</p>
+                        <small class="text-muted">
+                            Equipo: @(string.Join(", ", ruta.Equipo.Select(m => m.Nombre)))
+                        </small>
+                    </div>
+                }
+                else if (ruta.PuedeGestionar)
+                {
+                    <p class="text-muted small">Cuenta qué se logró, qué cambió para la comunidad y qué aprendieron. Al guardarlo, el problema se marca como resuelto.</p>
+                    <form asp-controller="Ruta" asp-action="DocumentarResultados" method="post"
+                          data-confirm="Al documentar los resultados el problema se marcará como resuelto y ya no recibirá cambios."
+                          data-confirm-titulo="Cerrar el problema"
+                          data-confirm-ok="Documentar"
+                          data-confirm-peligro="false">
+                        <input type="hidden" name="problemaId" value="@problema.Id" />
+                        <input type="hidden" name="solucionId" value="@ruta.Seleccionada.Id" />
+                        <textarea name="resultados" class="form-control mb-2" rows="5" maxlength="1500" required
+                                  placeholder="Resultados obtenidos..."></textarea>
+                        <button type="submit" class="btn btn-success">Documentar resultados</button>
+                    </form>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Aún no se han documentado resultados. El equipo lo hará al terminar.</p>
+                }
+            </div>
+        </div>
     </div>
 </div>
 
-
-
-@{
+@section Scripts {
+    <script src="~/js/comentarios.js" asp-append-version="true"></script>
+    <script src="~/js/ruta.js" asp-append-version="true"></script>
 }

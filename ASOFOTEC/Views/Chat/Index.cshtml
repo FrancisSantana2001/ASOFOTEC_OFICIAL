@@ -1,0 +1,142 @@
+@using ASOFOTEC.Dtos
+@using System.Text.Json
+@model ChatVm
+
+@{
+    ViewData["Title"] = "Mensajes";
+    ViewData["BodyClass"] = "pagina-chat";
+
+    var actual = Model.Actual;
+    ViewData["Activa"] = actual?.Id;
+
+    var opciones = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+    var avatarOtro = actual != null ? AvatarVm.De(actual.OtroNombre, actual.OtroFoto, "feed-avatar") : null;
+}
+
+<div id="chat-app" class="chat-app"
+     data-mi-id="@Model.MiId"
+     data-conversacion-id="@(actual?.Id ?? 0)"
+     data-otro-id="@(actual?.OtroId ?? 0)"
+     data-otro-nombre="@actual?.OtroNombre"
+     data-puede-escribir="@(actual?.PuedeEscribir == true ? "1" : "0")">
+
+    <!-- ===== Lista de conversaciones ===== -->
+    <aside class="chat-lista-panel @(actual != null ? "d-none d-lg-flex" : "d-flex")">
+        <div class="chat-lista-cabecera">
+            <h1 class="h5 mb-0">Mensajes</h1>
+            <a asp-action="Bloqueados" class="small text-decoration-none text-muted"><i class="bi bi-slash-circle me-1"></i>Bloqueados</a>
+        </div>
+        <div id="chat-lista" class="chat-lista">
+            <partial name="_ChatLista" model="Model.Conversaciones" />
+        </div>
+    </aside>
+
+    <!-- ===== Conversación ===== -->
+    <section class="chat-conv-panel @(actual == null ? "d-none d-lg-flex" : "d-flex")">
+
+        @if (actual == null)
+        {
+            <!-- Sin conversación abierta: se elige un amigo para empezar -->
+            <div class="chat-vacio">
+                <i class="bi bi-chat-dots fs-1 text-success"></i>
+                <h2 class="h5 mt-2">Tus mensajes</h2>
+                <p class="text-muted small mb-3">Solo puedes chatear con tus amigos: personas que te siguen y a quienes sigues.</p>
+
+                @if (Model.Amigos.Any())
+                {
+                    <div class="chat-amigos">
+                        <div class="small fw-semibold text-start mb-1">Empezar un chat</div>
+                        @foreach (var amigo in Model.Amigos)
+                        {
+                            var avatarAmigo = AvatarVm.De(amigo.Nombre, amigo.FotoUrl, "feed-avatar");
+                            <a class="chat-amigo" asp-action="Iniciar" asp-route-id="@amigo.Id">
+                                <partial name="_Avatar" model="avatarAmigo" />
+                                <span class="text-truncate">@amigo.Nombre</span>
+                                <i class="bi bi-chat-dots ms-auto text-success"></i>
+                            </a>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="small mb-0">
+                        Todavía no tienes amigos con quienes chatear.
+                        <a asp-controller="Personas" asp-action="Index">Busca personas y síguelas</a>:
+                        cuando también te sigan, podrán escribirse.
+                    </p>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Cabecera -->
+            <div class="chat-conv-cabecera">
+                <a asp-action="Index" class="btn btn-sm btn-light d-lg-none" aria-label="Volver a la lista"><i class="bi bi-arrow-left"></i></a>
+
+                <a asp-controller="Perfil" asp-action="Ver" asp-route-id="@actual.OtroId" class="d-flex align-items-center gap-2 text-decoration-none text-dark flex-grow-1" style="min-width:0">
+                    <partial name="_Avatar" model="avatarOtro" />
+                    <strong class="text-truncate">@actual.OtroNombre</strong>
+                </a>
+
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-light rounded-circle" type="button" data-bs-toggle="dropdown"
+                            data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" aria-label="Opciones del chat">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                        <li>
+                            <a class="dropdown-item" asp-controller="Perfil" asp-action="Ver" asp-route-id="@actual.OtroId">
+                                <i class="bi bi-person me-2"></i>Ver perfil
+                            </a>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item @(actual.BloqueadoPorMi ? "" : "text-danger") btn-bloquear"
+                                    data-usuario-id="@actual.OtroId" data-nombre="@actual.OtroNombre"
+                                    data-bloqueado="@(actual.BloqueadoPorMi ? "1" : "0")">
+                                <i class="bi bi-slash-circle me-2"></i>@(actual.BloqueadoPorMi ? "Desbloquear" : "Bloquear")
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Mensajes -->
+            <div id="chat-mensajes" class="chat-mensajes">
+                <div class="text-center @(actual.HayMas ? "" : "d-none")" id="chat-cargar-mas-caja">
+                    <button type="button" id="chat-cargar-mas" class="btn btn-sm btn-light mb-2">Cargar mensajes anteriores</button>
+                </div>
+                <div id="chat-flujo"></div>
+            </div>
+
+            <div id="chat-escribiendo" class="chat-escribiendo d-none"></div>
+
+            <!-- Pie: cuadro de texto, o el motivo por el que no se puede escribir -->
+            <div class="chat-pie">
+                @if (actual.PuedeEscribir)
+                {
+                    <form id="chat-form" class="d-flex align-items-end gap-2" autocomplete="off">
+                        <textarea id="chat-input" class="form-control chat-input" rows="1" maxlength="1000"
+                                  placeholder="Escribe un mensaje..." aria-label="Mensaje"></textarea>
+                        <button type="submit" id="chat-enviar" class="btn btn-as btn-enviar-chat" aria-label="Enviar">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="chat-bloqueado">
+                        <i class="bi bi-lock me-1"></i>@actual.Motivo
+                        @if (actual.BloqueadoPorMi)
+                        {
+                            <button type="button" class="btn btn-sm btn-as-outline ms-2 btn-bloquear"
+                                    data-usuario-id="@actual.OtroId" data-nombre="@actual.OtroNombre" data-bloqueado="1">Desbloquear</button>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Mensajes iniciales (el texto va codificado: System.Text.Json escapa < > & y comillas) -->
+            <script type="application/json" id="chat-datos">@Html.Raw(JsonSerializer.Serialize(new { mensajes = actual.Mensajes, hayMas = actual.HayMas }, opciones))</script>
+        }
+    </section>
+</div>

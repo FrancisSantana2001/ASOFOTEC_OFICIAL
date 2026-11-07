@@ -27,6 +27,7 @@
 
                         <form asp-action="Login" method="post">
                             @Html.AntiForgeryToken()
+                            <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
                             <div class="mb-3">
                                 <label asp-for="Correo" class="form-label">Correo Electrónico</label>
                                 <input asp-for="Correo" class="form-control-lg" placeholder="correo@ejemplo.com" />

@@ -1,4 +1,5 @@
 ﻿using ASOFOTEC.Dtos;
+using ASOFOTEC.Helpers;
 using ASOFOTEC.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -41,13 +42,22 @@ namespace ASOFOTEC.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl = null)
         {
+            // Si ya tiene una sesión válida, no tiene sentido mostrar el login
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                return RedirigirTrasLogin(returnUrl);
+            }
+
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Login(LoginDto login)
+        public async Task<IActionResult> Login(LoginDto login, string? returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
+
             if (!ModelState.IsValid)
             {
                 return View(login);
@@ -76,6 +86,7 @@ namespace ASOFOTEC.Controllers
             HttpContext.Session.SetString("Nombre", nombre ?? "");
             HttpContext.Session.SetString("Rol", rol ?? "Usuario");
             HttpContext.Session.SetString("UserId", userId ?? "");
+            HttpContext.Session.SetString("Foto", result.FotoPerfilUrl ?? "");
 
             Response.Cookies.Append("Jwt", result.Token!, new CookieOptions
             {
@@ -84,8 +95,19 @@ namespace ASOFOTEC.Controllers
                 SameSite = SameSiteMode.Lax,
                 Expires = DateTimeOffset.UtcNow.AddHours(2)
             });
-            return RedirectToAction("Index", "Home");
+            TempData["Success"] = $"¡Bienvenido, {nombre}!";
+            return RedirigirTrasLogin(returnUrl);
 
+        }
+
+        // Vuelve a la página que el usuario quería abrir (solo rutas del propio sitio) o al inicio
+        private IActionResult RedirigirTrasLogin(string? returnUrl)
+        {
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            {
+                return LocalRedirect(returnUrl);
+            }
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Logout()

@@ -1,175 +1,292 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using System.Security.Claims
+@using ASOFOTEC.Dtos
+@{
+    // Una sola fuente de verdad para saber quién está navegando (token o sesión)
+    var usuarioId = Context.ObtenerUsuarioId();
+    var autenticado = usuarioId.HasValue;
+
+    var nombre = Context.Session.GetString("Nombre");
+    if (string.IsNullOrEmpty(nombre)) nombre = Context.User.FindFirstValue(ClaimTypes.Name);
+
+    var controlador = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var accion = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    var enInicio = controlador == "Home" && accion == "Index";
+    var enCrearProblema = controlador == "Problema" && accion == "Create";
+    var enProblemas = controlador == "Problema" && !enCrearProblema;
+    var enSoluciones = controlador == "Solucion";
+    var enProyectos = controlador == "Proyecto";
+    var enComunidad = controlador == "Home" && accion == "Comunidad";
+    var enNosotros = controlador == "Home" && accion == "Nosotros";
+
+    // Tras iniciar sesión se vuelve a la página actual (salvo que ya se esté en login/registro)
+    string? returnUrl = controlador == "Auth" ? null : Context.Request.Path + Context.Request.QueryString;
+
+    var fotoSesion = Context.Session.GetString("Foto");
+    var avatarNav = AvatarVm.De(nombre, fotoSesion, "feed-avatar nav-avatar");
+
+    var avisoExito = TempData["Success"] as string;
+    var avisoError = TempData["Error"] as string;
+}
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#19211e" />
+
+    <!-- Tema claro / oscuro: se aplica antes de pintar la página para que no haya parpadeo.
+         Usa la opción guardada en este navegador o, si no hay, la del sistema. -->
+    <script>
+        (function () {
+            try {
+                var tema = localStorage.getItem('as-tema');
+                if (tema !== 'dark' && tema !== 'light') {
+                    tema = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                document.documentElement.setAttribute('data-bs-theme', tema);
+            } catch (e) { /* sin almacenamiento: se queda en claro */ }
+        })();
+    </script>
     <title>@ViewData["Title"] - ASOFOTEC</title>
+    <link rel="icon" type="image/png" href="~/img/brand/favicon-64.png" />
+    @if (ViewData["OgTitulo"] is string ogTitulo)
+    {
+        <!-- Vista previa al compartir el enlace (WhatsApp, Facebook, etc.) -->
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="ASOFOTEC" />
+        <meta property="og:title" content="@ogTitulo" />
+        <meta property="og:description" content="@(ViewData["OgDescripcion"] as string)" />
+        <meta property="og:url" content="@(ViewData["OgUrl"] as string)" />
+        @if (ViewData["OgImagen"] is string ogImagen)
+        {
+            <meta property="og:image" content="@ogImagen" />
+            <meta name="twitter:card" content="summary_large_image" />
+        }
+    }
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/asofotec.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ASOFOTEC.styles.css" asp-append-version="true" />
+    <!-- El tema va al final para que su paleta tenga la última palabra -->
+    <link rel="stylesheet" href="~/css/tema.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
 </head>
-<body>
+<body class="tiene-bottom-nav d-flex flex-column min-vh-100 @ViewData["BodyClass"]">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ASOFOTEC</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-xl as-nav sticky-top mb-3">
+            <div class="container-fluid px-3 px-xl-4">
+
+                <!-- Logo de la plataforma -->
+                <a class="as-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/img/brand/logo-icono.png" alt="" />
+                    <span class="as-brand-texto">
+                        <strong>ASOFOTEC</strong>
+                        <small>Asociación Sostenible<br />para Fomentar la Tecnología</small>
+                    </span>
+                </a>
+
+                @if (autenticado)
+                {
+                    <!-- Campana (móvil y tablet): fuera del menú desplegable para que siempre se vea -->
+                    <div class="d-xl-none ms-auto me-2 d-flex align-items-center">
+                        <partial name="_IconoMensajes" />
+                        <partial name="_Campana" />
+                    </div>
+                }
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                        aria-controls="menuPrincipal" aria-expanded="false" aria-label="Abrir el menú">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Problema" asp-action="Index">Problemas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Solucion" asp-action="Create">Soluciones</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+
+                <div class="collapse navbar-collapse" id="menuPrincipal">
+
+                    <!-- Enlaces principales -->
+                    <ul class="navbar-nav as-nav-links mx-xl-auto">
+                        <li class="nav-item"><a class="nav-link @(enInicio ? "active" : "")" asp-controller="Home" asp-action="Index">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link @(enProblemas ? "active" : "")" asp-controller="Problema" asp-action="Index">Problemas</a></li>
+                        <li class="nav-item"><a class="nav-link @(enSoluciones ? "active" : "")" asp-controller="Solucion" asp-action="Index">Soluciones</a></li>
+                        <li class="nav-item"><a class="nav-link @(enProyectos ? "active" : "")" asp-controller="Proyecto" asp-action="Index">Proyectos</a></li>
+                        <li class="nav-item"><a class="nav-link @(enComunidad ? "active" : "")" asp-controller="Home" asp-action="Comunidad">Comunidad</a></li>
+                        <li class="nav-item"><a class="nav-link @(enNosotros ? "active" : "")" asp-controller="Home" asp-action="Nosotros">Sobre Nosotros</a></li>
                     </ul>
 
-                    @{
-                        var nombre = Context.Session.GetString("Nombre");
-                        var rol = Context.Session.GetString("Rol");
-                    }
+                    <div class="d-flex flex-column flex-xl-row align-items-xl-center gap-2 mt-3 mt-xl-0">
 
-                    <div class="d-flex align-items-center gap-2 ms-auto">
+                        <!-- Cambiar entre tema claro y oscuro -->
+                        <button type="button" class="btn-tema align-self-start align-self-xl-center" aria-label="Cambiar a tema oscuro" title="Tema claro / oscuro">
+                            <i class="bi bi-moon-stars"></i>
+                        </button>
 
-                        @if (string.IsNullOrEmpty(nombre))
+                        <!-- Búsqueda de problemas: campo visible en móvil, icono desplegable en escritorio -->
+                        <form asp-controller="Problema" asp-action="Index" method="get" role="search" class="d-xl-none">
+                            <div class="input-group">
+                                <input type="search" name="q" class="form-control" placeholder="Buscar problemas" aria-label="Buscar problemas" />
+                                <button class="btn btn-as-outline" type="submit" aria-label="Buscar"><i class="bi bi-search"></i></button>
+                            </div>
+                        </form>
+
+                        <div class="dropdown d-none d-xl-block">
+                            <button class="as-buscar-btn" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                                    aria-expanded="false" aria-label="Buscar problemas">
+                                <i class="bi bi-search"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end as-buscar-menu shadow border-0">
+                                <form asp-controller="Problema" asp-action="Index" method="get" role="search">
+                                    <div class="input-group">
+                                        <input type="search" name="q" class="form-control" placeholder="Buscar problemas" aria-label="Buscar problemas" />
+                                        <button class="btn btn-as" type="submit" aria-label="Buscar"><i class="bi bi-search"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        @if (!autenticado)
                         {
-                            <a asp-controller="Auth"
-                               asp-action="Login"
-                               class="btn btn-outline-success">
-                                Iniciar Sesión
-                            </a>
-
-                            <a asp-controller="Auth"
-                               asp-action="Register"
-                               class="btn btn-success">
-                                Registrarse
-                            </a>
+                            <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@returnUrl" class="btn btn-as-outline">Iniciar sesión</a>
+                            <a asp-controller="Auth" asp-action="Register" class="btn btn-as"><i class="bi bi-person-plus me-1"></i>Registrarse</a>
                         }
                         else
                         {
+                            <a asp-controller="Problema" asp-action="Create" class="btn btn-as">
+                                <i class="bi bi-plus-lg me-1"></i>Publicar problema
+                            </a>
+
+                            <!-- Campana (escritorio) -->
+                            <div class="d-none d-xl-flex align-items-center">
+                                <partial name="_IconoMensajes" />
+                                <partial name="_Campana" />
+                            </div>
+
                             <div class="dropdown">
-                                <button class="btn btn-outline-success dropdown-toggle"
-                                        type="button"
-                                        data-bs-toggle="dropdown">
-                                    @nombre
+                                <button class="btn btn-as-outline d-flex align-items-center gap-2 w-100 justify-content-center"
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <partial name="_Avatar" model="avatarNav" />
+                                    <span class="text-truncate" style="max-width:140px">@nombre</span>
                                 </button>
-
                                 <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-
-                                    @if (rol == "Admin")
-                                    {
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Admin"
-                                               asp-action="Index">
-                                                Panel de Administración
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider" /></li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Problema"
-                                               asp-action="Index">
-                                                Gestionar Problemas
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Solucion"
-                                               asp-action="Index">
-                                                Gestionar Soluciones
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Comentario"
-                                               asp-action="Index">
-                                                Gestionar Comentarios
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Usuario"
-                                               asp-action="Index">
-                                                Gestionar Usuarios
-                                            </a>
-                                        </li>
-                                    }
-                                    else
-                                    {
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Perfil"
-                                               asp-action="Index">
-                                                Mi Perfil
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Problema"
-                                               asp-action="MisPublicaciones">
-                                                Mis Publicaciones
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Solucion"
-                                               asp-action="MisSoluciones">
-                                                Mis Soluciones
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-controller="Comentario"
-                                               asp-action="MisComentarios">
-                                                Mis Comentarios
-                                            </a>
-                                        </li>
-                                    }
-
-                                    <li><hr class="dropdown-divider" /></li>
-
-                                    <li>
-                                        <a class="dropdown-item text-danger"
-                                           asp-controller="Auth"
-                                           asp-action="Logout">
-                                            Cerrar Sesión
-                                        </a>
-                                    </li>
+                                    <partial name="_MenuCuenta" />
                                 </ul>
                             </div>
                         }
-
                     </div>
-
-                    
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+
+    <div class="container flex-grow-1">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ASOFOTEC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Pie de página -->
+    <footer class="as-footer">
+        <div class="container py-3 d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-center text-md-start">
+            <a class="as-brand m-0" asp-area="" asp-controller="Home" asp-action="Index">
+                <img src="~/img/brand/logo-icono.png" alt="" />
+                <span class="as-brand-texto text-start">
+                    <strong>ASOFOTEC</strong>
+                    <small>Asociación Sostenible<br />para Fomentar la Tecnología</small>
+                </span>
+            </a>
+
+            <p class="mb-0 small text-muted">
+                &copy; @DateTime.Now.Year ASOFOTEC. Todos los derechos reservados.
+                <span class="d-none d-sm-inline">·</span>
+                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-muted">Privacidad</a>
+            </p>
+
+            <!-- Redes sociales: reemplaza el "#" por la dirección real de cada perfil -->
+            <div class="as-redes">
+                <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+            </div>
         </div>
     </footer>
+
+    <!-- Barra de navegación inferior (solo móvil y tablet) -->
+    <nav class="bottom-nav d-lg-none" aria-label="Navegación principal">
+        <a class="bottom-nav-item @(enInicio ? "activo" : "")" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-house-door"></i><span>Inicio</span>
+        </a>
+        <a class="bottom-nav-item @(enProblemas ? "activo" : "")" asp-controller="Problema" asp-action="Index">
+            <i class="bi bi-compass"></i><span>Problemas</span>
+        </a>
+
+        @if (autenticado)
+        {
+            <a class="bottom-nav-item bottom-nav-crear" asp-controller="Problema" asp-action="Create"
+               aria-label="Publicar un problema" title="Publicar un problema">
+                <i class="bi bi-plus-lg"></i>
+            </a>
+
+            <div class="dropup bottom-nav-item p-0">
+                <button type="button" class="bottom-nav-item bottom-nav-boton" data-bs-toggle="dropdown"
+                        data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false">
+                    <i class="bi bi-person-circle"></i><span>Cuenta</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <partial name="_MenuCuenta" />
+                </ul>
+            </div>
+        }
+        else
+        {
+            <a class="bottom-nav-item" asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@returnUrl">
+                <i class="bi bi-box-arrow-in-right"></i><span>Ingresar</span>
+            </a>
+            <a class="bottom-nav-item" asp-controller="Auth" asp-action="Register">
+                <i class="bi bi-person-plus"></i><span>Registrarse</span>
+            </a>
+        }
+    </nav>
+
+    @if (autenticado)
+    {
+        <!-- Token antiforgery para las peticiones AJAX (comentarios, seguir, notificaciones) -->
+        <form id="antiforgery-form" class="d-none">@Html.AntiForgeryToken()</form>
+    }
+
+    <!-- Avisos (toasts) y mensajes del servidor -->
+    <div class="toast-container position-fixed top-0 end-0 p-3 ux-toasts" id="toast-container"></div>
+    <div id="ux-mensajes" class="d-none" data-success="@avisoExito" data-error="@avisoError"></div>
+
+    <!-- Modal de confirmación (reemplaza a confirm()) -->
+    <div class="modal fade" id="ux-confirm" tabindex="-1" aria-labelledby="ux-confirm-titulo" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-body text-center p-4">
+                    <div id="ux-confirm-icono" class="ux-confirm-icono mb-2 text-danger"><i class="bi bi-exclamation-triangle"></i></div>
+                    <h6 id="ux-confirm-titulo" class="fw-bold">¿Estás seguro?</h6>
+                    <p id="ux-confirm-mensaje" class="text-muted small mb-3"></p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="ux-confirm-aceptar">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/tema.js" asp-append-version="true"></script>
+    <script src="~/js/ux.js" asp-append-version="true"></script>
+    <script src="~/js/social.js" asp-append-version="true"></script>
+    @if (autenticado)
+    {
+        <!-- Chat en tiempo real (SignalR). La librería se instala con LibMan: Restore Client-Side Libraries -->
+        <script src="~/lib/microsoft-signalr/dist/browser/signalr.min.js"></script>
+        <script src="~/js/chat.js" asp-append-version="true"></script>
+    }
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

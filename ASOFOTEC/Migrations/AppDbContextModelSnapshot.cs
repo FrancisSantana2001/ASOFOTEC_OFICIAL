@@ -22,7 +22,7 @@ namespace ASOFOTEC.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ASOFOTEC.Models.Comentario", b =>
+            modelBuilder.Entity("ASOFOTEC.Models.Avance", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,8 +34,11 @@ namespace ASOFOTEC.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("FechaComentario")
+                    b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("Porcentaje")
+                        .HasColumnType("int");
 
                     b.Property<int>("SolucionId")
                         .HasColumnType("int");
@@ -49,7 +52,126 @@ namespace ASOFOTEC.Migrations
 
                     b.HasIndex("UsuarioId");
 
+                    b.ToTable("Avances");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Colaborador", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FechaUnion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SolucionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.HasIndex("SolucionId", "UsuarioId")
+                        .IsUnique();
+
+                    b.ToTable("Colaboradores");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Comentario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ComentarioPadreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaComentario")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PublicacionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SolucionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ComentarioPadreId");
+
+                    b.HasIndex("PublicacionId");
+
+                    b.HasIndex("SolucionId");
+
+                    b.HasIndex("UsuarioId");
+
                     b.ToTable("Comentarios");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.LikeComentario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Comentario_Id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FechaLike")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Usuario_Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Comentario_Id");
+
+                    b.HasIndex("Usuario_Id");
+
+                    b.ToTable("LikeComentarios");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.LikePublicacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FechaLike")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Publicacion_Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Usuario_Id")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Publicacion_Id");
+
+                    b.HasIndex("Usuario_Id");
+
+                    b.ToTable("LikePublicaciones");
                 });
 
             modelBuilder.Entity("ASOFOTEC.Models.LikeSolucion", b =>
@@ -78,6 +200,140 @@ namespace ASOFOTEC.Migrations
                     b.ToTable("LikeSoluciones");
                 });
 
+            modelBuilder.Entity("ASOFOTEC.Models.Bloqueo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BloqueadoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BloqueadorId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BloqueadoId");
+
+                    b.HasIndex("BloqueadorId", "BloqueadoId")
+                        .IsUnique();
+
+                    b.ToTable("Bloqueos");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Conversacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Creada")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("UltimaActividad")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UsuarioAId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioBId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioBId");
+
+                    b.HasIndex("UsuarioAId", "UsuarioBId")
+                        .IsUnique();
+
+                    b.ToTable("Conversaciones");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Mensaje", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ConversacionId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LeidoEn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RemitenteId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Texto")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RemitenteId");
+
+                    b.HasIndex("ConversacionId", "Fecha");
+
+                    b.ToTable("Mensajes");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Notificacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ActorId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Extracto")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Leida")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Mensaje")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActorId");
+
+                    b.HasIndex("UsuarioId", "Leida", "Fecha");
+
+                    b.ToTable("Notificaciones");
+                });
+
             modelBuilder.Entity("ASOFOTEC.Models.Problema", b =>
                 {
                     b.Property<int>("Id")
@@ -87,6 +343,12 @@ namespace ASOFOTEC.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Categoria")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Causas")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Consecuencias")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Descripcion")
@@ -101,7 +363,12 @@ namespace ASOFOTEC.Migrations
                     b.Property<string>("Titulo")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UsuarioId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("problemas");
                 });
@@ -119,6 +386,12 @@ namespace ASOFOTEC.Migrations
 
                     b.Property<DateTime>("Fecha_Publicacion")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("MediaTipo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MediaUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
@@ -147,6 +420,33 @@ namespace ASOFOTEC.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("ASOFOTEC.Models.Seguimiento", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SeguidoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SeguidorId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeguidoId");
+
+                    b.HasIndex("SeguidorId", "SeguidoId")
+                        .IsUnique();
+
+                    b.ToTable("Seguimientos");
+                });
+
             modelBuilder.Entity("ASOFOTEC.Models.Solucion", b =>
                 {
                     b.Property<int>("Id")
@@ -154,6 +454,9 @@ namespace ASOFOTEC.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Costo")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
@@ -164,8 +467,23 @@ namespace ASOFOTEC.Migrations
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("FechaResultados")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Impacto")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ProblemaId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Resultados")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Seleccionada")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("TiempoEstimado")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
@@ -198,14 +516,29 @@ namespace ASOFOTEC.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("FechaNacimiento")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("Fecha_Ingreso")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("FotoPerfilUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FotoPortadaUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Sexo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Telefono")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -228,13 +561,60 @@ namespace ASOFOTEC.Migrations
                     b.ToTable("RolesUser");
                 });
 
-            modelBuilder.Entity("ASOFOTEC.Models.Comentario", b =>
+            modelBuilder.Entity("ASOFOTEC.Models.Avance", b =>
                 {
                     b.HasOne("ASOFOTEC.Models.Solucion", "Solucion")
-                        .WithMany("Comentarios")
+                        .WithMany("Avances")
                         .HasForeignKey("SolucionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Solucion");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Colaborador", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Solucion", "Solucion")
+                        .WithMany("Colaboradores")
+                        .HasForeignKey("SolucionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Solucion");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Comentario", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Comentario", "ComentarioPadre")
+                        .WithMany("Respuestas")
+                        .HasForeignKey("ComentarioPadreId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ASOFOTEC.Models.Publicacion", "Publicacion")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("PublicacionId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("ASOFOTEC.Models.Solucion", "Solucion")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("SolucionId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("ASOFOTEC.Models.Usuario", "Usuario")
                         .WithMany("Comentarios")
@@ -242,7 +622,49 @@ namespace ASOFOTEC.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.Navigation("ComentarioPadre");
+
+                    b.Navigation("Publicacion");
+
                     b.Navigation("Solucion");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.LikeComentario", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Comentario", "Comentario")
+                        .WithMany("Likes")
+                        .HasForeignKey("Comentario_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("Usuario_Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Comentario");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.LikePublicacion", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Publicacion", "Publicacion")
+                        .WithMany("Likes")
+                        .HasForeignKey("Publicacion_Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("Usuario_Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Publicacion");
 
                     b.Navigation("Usuario");
                 });
@@ -275,6 +697,111 @@ namespace ASOFOTEC.Migrations
                         .IsRequired();
 
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Bloqueo", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Bloqueado")
+                        .WithMany()
+                        .HasForeignKey("BloqueadoId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Bloqueador")
+                        .WithMany()
+                        .HasForeignKey("BloqueadorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Bloqueado");
+
+                    b.Navigation("Bloqueador");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Conversacion", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Usuario", "UsuarioA")
+                        .WithMany()
+                        .HasForeignKey("UsuarioAId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "UsuarioB")
+                        .WithMany()
+                        .HasForeignKey("UsuarioBId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("UsuarioA");
+
+                    b.Navigation("UsuarioB");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Mensaje", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Conversacion", "Conversacion")
+                        .WithMany("Mensajes")
+                        .HasForeignKey("ConversacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Remitente")
+                        .WithMany()
+                        .HasForeignKey("RemitenteId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Conversacion");
+
+                    b.Navigation("Remitente");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Notificacion", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Actor")
+                        .WithMany()
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Problema", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Usuario")
+                        .WithMany("Problemas")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Seguimiento", b =>
+                {
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Seguido")
+                        .WithMany()
+                        .HasForeignKey("SeguidoId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("ASOFOTEC.Models.Usuario", "Seguidor")
+                        .WithMany()
+                        .HasForeignKey("SeguidorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Seguido");
+
+                    b.Navigation("Seguidor");
                 });
 
             modelBuilder.Entity("ASOFOTEC.Models.Solucion", b =>
@@ -315,9 +842,28 @@ namespace ASOFOTEC.Migrations
                     b.Navigation("usuario");
                 });
 
+            modelBuilder.Entity("ASOFOTEC.Models.Comentario", b =>
+                {
+                    b.Navigation("Likes");
+
+                    b.Navigation("Respuestas");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Conversacion", b =>
+                {
+                    b.Navigation("Mensajes");
+                });
+
             modelBuilder.Entity("ASOFOTEC.Models.Problema", b =>
                 {
                     b.Navigation("Soluciones");
+                });
+
+            modelBuilder.Entity("ASOFOTEC.Models.Publicacion", b =>
+                {
+                    b.Navigation("Comentarios");
+
+                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("ASOFOTEC.Models.Roles", b =>
@@ -327,6 +873,10 @@ namespace ASOFOTEC.Migrations
 
             modelBuilder.Entity("ASOFOTEC.Models.Solucion", b =>
                 {
+                    b.Navigation("Avances");
+
+                    b.Navigation("Colaboradores");
+
                     b.Navigation("Comentarios");
 
                     b.Navigation("Likes");
@@ -337,6 +887,8 @@ namespace ASOFOTEC.Migrations
                     b.Navigation("Comentarios");
 
                     b.Navigation("Likes");
+
+                    b.Navigation("Problemas");
 
                     b.Navigation("Publicaciones");
 

@@ -14,5 +14,12 @@ namespace ASOFOTEC.Dtos
 
         [Required]
         public string? Categoria { get; set; }
+
+        // Paso 2 de la ruta (opcional: se puede completar después)
+        [MaxLength(1000)]
+        public string? Causas { get; set; }
+
+        [MaxLength(1000)]
+        public string? Consecuencias { get; set; }
     }
 }

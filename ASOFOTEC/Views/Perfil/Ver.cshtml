@@ -1,0 +1,149 @@
+@using ASOFOTEC.Dtos
+@model PerfilPublicoVm
+
+@{
+    ViewData["Title"] = Model.Nombre;
+    var avatar = AvatarVm.De(Model.Nombre, Model.FotoPerfilUrl, "feed-avatar-lg");
+}
+
+<div class="mt-2 mb-4">
+
+    <!-- Portada (solo lectura) -->
+    @if (!string.IsNullOrEmpty(Model.FotoPortadaUrl))
+    {
+        <div class="perfil-portada" style="background-image:url('@Model.FotoPortadaUrl')"></div>
+    }
+    else
+    {
+        <div class="perfil-portada"></div>
+    }
+
+    <div class="perfil-cabecera">
+        <div class="d-flex flex-wrap align-items-end gap-3">
+            <div class="perfil-avatar-caja">
+                <div class="perfil-avatar"><partial name="_Avatar" model="avatar" /></div>
+            </div>
+
+            <div class="flex-grow-1 pb-1" style="min-width:0">
+                <h1 class="h4 mb-1">@Model.Nombre</h1>
+                <div class="d-flex flex-wrap align-items-center gap-2 small text-muted">
+                    @if (Model.EsAmigo)
+                    {
+                        <span class="badge text-bg-success"><i class="bi bi-people-fill me-1"></i>Amigos</span>
+                    }
+                    else if (Model.MeSigue)
+                    {
+                        <span class="badge text-bg-light border">Te sigue</span>
+                    }
+                    <span>Miembro desde @Model.FechaIngreso.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+
+            <div class="pb-1 d-flex align-items-center gap-2">
+                @if (Model.MeBloqueo)
+                {
+                    <span class="text-muted small">No disponible</span>
+                }
+                else if (Model.BloqueadoPorMi)
+                {
+                    <button type="button" class="btn btn-as-outline btn-bloquear"
+                            data-usuario-id="@Model.Id" data-nombre="@Model.Nombre" data-bloqueado="1">Desbloquear</button>
+                }
+                else
+                {
+                    <button type="button"
+                            class="btn btn-seguir @(Model.SigoYo ? "btn-as-outline" : "btn-as")"
+                            data-usuario-id="@Model.Id"
+                            data-me-sigue="@(Model.MeSigue ? "1" : "0")">@(Model.SigoYo ? "Siguiendo" : (Model.MeSigue ? "Seguir también" : "Seguir"))</button>
+
+                    @if (Model.EsAmigo)
+                    {
+                        <a asp-controller="Chat" asp-action="Iniciar" asp-route-id="@Model.Id" class="btn btn-as-outline">
+                            <i class="bi bi-chat-dots me-1"></i>Mensaje
+                        </a>
+                    }
+
+                    <div class="dropdown">
+                        <button class="btn btn-light rounded-circle" type="button" data-bs-toggle="dropdown"
+                                data-bs-popper-config='{"strategy":"fixed"}' aria-expanded="false" aria-label="Más opciones">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <button type="button" class="dropdown-item text-danger btn-bloquear"
+                                        data-usuario-id="@Model.Id" data-nombre="@Model.Nombre" data-bloqueado="0">
+                                    <i class="bi bi-slash-circle me-2"></i>Bloquear
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row g-0 text-center mt-3 pt-3 border-top">
+            <div class="col"><strong class="d-block">@Model.TotalPublicaciones</strong><small class="text-muted">Publicaciones</small></div>
+            <div class="col"><strong class="d-block">@Model.TotalProblemas</strong><small class="text-muted">Problemas</small></div>
+            <div class="col"><strong class="d-block">@Model.TotalSoluciones</strong><small class="text-muted">Soluciones</small></div>
+            <div class="col">
+                <a asp-action="Conexiones" asp-route-id="@Model.Id" asp-route-tipo="seguidores" class="text-decoration-none text-dark">
+                    <strong class="d-block" data-seguidores-de="@Model.Id">@Model.Seguidores</strong><small class="text-muted">Seguidores</small>
+                </a>
+            </div>
+            <div class="col">
+                <a asp-action="Conexiones" asp-route-id="@Model.Id" asp-route-tipo="siguiendo" class="text-decoration-none text-dark">
+                    <strong class="d-block">@Model.Siguiendo</strong><small class="text-muted">Siguiendo</small>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <!-- Actividad -->
+        <div class="col-lg-8">
+            <h2 class="h5 as-pagina-titulo mb-3">Actividad reciente</h2>
+
+            @if (!Model.Actividad.Any())
+            {
+                <div class="alert alert-light border">@Model.Nombre todavía no ha publicado nada.</div>
+            }
+
+            @foreach (var item in Model.Actividad)
+            {
+                if (item.Tipo == FeedItemDto.TipoProblema)
+                {
+                    <partial name="_FeedProblema" model="item" />
+                }
+                else if (item.Tipo == FeedItemDto.TipoSolucion)
+                {
+                    <partial name="_FeedSolucion" model="item" />
+                }
+                else
+                {
+                    <partial name="_FeedPublicacion" model="item" />
+                }
+            }
+        </div>
+
+        <!-- En común -->
+        <div class="col-lg-4">
+            @if (Model.EnComun.Any())
+            {
+                <div class="as-tarjeta-simple">
+                    <h2 class="h6 fw-bold mb-1">En común contigo</h2>
+                    <p class="small text-muted mb-2">
+                        Lo siguen @Model.EnComun.Count @(Model.EnComun.Count == 1 ? "persona" : "personas") que tú sigues.
+                    </p>
+                    @foreach (var persona in Model.EnComun.Take(6))
+                    {
+                        <partial name="_Persona" model="persona" />
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/comentarios.js" asp-append-version="true"></script>
+}

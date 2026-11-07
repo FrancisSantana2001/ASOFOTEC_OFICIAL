@@ -1,6 +1,218 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
-}
-<h1>@ViewData["Title"]</h1>
+    ViewData["Title"] = "Política de privacidad";
 
-<p>Use this page to detail your site's privacy policy.</p>
+    // Correo al que las personas pueden escribir para ejercer sus derechos
+    var correoContacto = "Francissantana0776@gmail.com";
+}
+
+<!--
+    Política de privacidad redactada como plantilla a partir de lo que el sitio hace hoy.
+    Antes de publicar el sitio conviene que la revise una persona con formación legal.
+    Si se agregan funciones nuevas (notificaciones push, chats en grupo, inicio de sesión con Google o Facebook, etc.)
+    hay que actualizar este texto antes de activarlas.
+-->
+
+<div class="mt-2 mb-4" style="max-width: 860px">
+    <h1 class="h2 as-pagina-titulo">Política de privacidad</h1>
+    <p class="text-muted">Última actualización: noviembre de 2026</p>
+
+    <div class="as-tarjeta-simple mb-3">
+        <p class="mb-2">
+            <strong>ASOFOTEC</strong> (Asociación Sostenible para Fomentar la Tecnología) es una plataforma donde
+            las personas publican problemas de su comunidad, proponen soluciones y colaboran para ejecutarlas.
+            Esta política explica, en lenguaje sencillo, qué datos tuyos guardamos, para qué los usamos, quién puede verlos
+            y qué puedes hacer con ellos.
+        </p>
+        <p class="mb-0">
+            Al crear una cuenta confirmas que la leíste y la aceptas. Si no estás de acuerdo, no uses la plataforma.
+        </p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">1. Qué datos recogemos</h2>
+
+        <h3 class="h6 mt-3">Cuando te registras</h3>
+        <ul>
+            <li>Nombre y apellido.</li>
+            <li>Correo electrónico.</li>
+            <li>Número de teléfono.</li>
+            <li>Fecha de nacimiento (con ella calculamos tu edad exacta).</li>
+            <li>Sexo (Masculino o Femenino).</li>
+            <li>Contraseña. <strong>No la guardamos tal cual:</strong> se almacena cifrada de forma irreversible (BCrypt), por lo que ni siquiera el administrador puede verla.</li>
+        </ul>
+
+        <h3 class="h6 mt-3">Lo que tú decides agregar</h3>
+        <ul>
+            <li>Foto de perfil y foto de portada (opcionales).</li>
+            <li>Problemas, soluciones, avances, resultados, publicaciones y comentarios que escribas.</li>
+            <li>Fotos y videos que adjuntes a tus publicaciones.</li>
+            <li>Tus “me gusta” y tu participación en equipos de trabajo.</li>
+            <li>A quién sigues y quién te sigue.</li>
+            <li>Tus <strong>mensajes privados</strong>: el texto, la fecha y hora, y si la otra persona ya los vio.</li>
+            <li>La lista de personas que bloqueaste.</li>
+        </ul>
+
+        <h3 class="h6 mt-3">Datos que se generan automáticamente</h3>
+        <ul>
+            <li>La fecha en que te registraste.</li>
+            <li>Tus notificaciones: avisos de que alguien te dio me gusta, te comentó, te respondió, te siguió o propuso una solución a un problema tuyo.</li>
+            <li>Cookies necesarias para mantener tu sesión (ver el punto 5).</li>
+            <li>Como cualquier sitio web, el servidor puede registrar de forma técnica datos de conexión, como tu dirección IP, para detectar fallas y abusos.</li>
+        </ul>
+
+        <p class="mb-0">No recogemos tu ubicación exacta, ni tus contactos, ni datos de pago.</p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">2. Para qué usamos tus datos</h2>
+        <ul class="mb-0">
+            <li>Crear y mantener tu cuenta y permitirte iniciar sesión.</li>
+            <li><strong>Verificar que tienes al menos 15 años</strong>, la edad mínima para usar ASOFOTEC.</li>
+            <li>Mostrar tu nombre, tu foto y tu contenido a la comunidad cuando participas.</li>
+            <li>Permitir las funciones de la plataforma: proponer y comparar soluciones, formar equipos y registrar avances.</li>
+            <li>Avisarte, con la campana de notificaciones, de lo que otras personas hacen con tu contenido o contigo.</li>
+            <li>Sugerirte personas que quizá conozcas, a partir de a quién sigues y de quién te sigue.</li>
+            <li>Permitir que chatees con tus amigos (personas que te siguen y a quienes sigues) y mostrarte si leyeron tus mensajes.</li>
+            <li>Mantener la seguridad del sitio y moderar contenido que incumpla las normas.</li>
+            <li>Generar estadísticas generales y anónimas (por ejemplo, cuántos miembros tiene la plataforma).</li>
+        </ul>
+        <p class="mt-2 mb-0">No usamos tus datos para publicidad y <strong>no los vendemos</strong>.</p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">3. Quién puede ver qué</h2>
+
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-2">
+                <thead>
+                    <tr><th>Dato</th><th>Otros usuarios</th><th>Administrador (DBA)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Nombre y foto de perfil</td><td>Sí</td><td>Sí</td></tr>
+                    <tr><td>Lo que publicas (problemas, soluciones, comentarios, fotos y videos)</td><td>Sí</td><td>Sí</td></tr>
+                    <tr><td>Personas que sigues y personas que te siguen</td><td>Sí (en tu perfil)</td><td>Sí</td></tr>
+                    <tr><td>Tus notificaciones</td><td>No</td><td>No se consultan</td></tr>
+                    <tr><td>Mensajes privados (chat)</td><td>Solo la otra persona de la conversación</td><td><strong>No</strong>: no existe ninguna función para leerlos</td></tr>
+                    <tr><td>Personas que bloqueaste</td><td>No (no se les avisa)</td><td>No se consultan</td></tr>
+                    <tr><td>Correo electrónico</td><td>No</td><td>Sí</td></tr>
+                    <tr><td>Edad</td><td>No</td><td>Sí</td></tr>
+                    <tr><td>Teléfono, fecha de nacimiento y sexo</td><td>No</td><td>No se consultan individualmente; solo aparecen en estadísticas agregadas</td></tr>
+                    <tr><td>Contraseña</td><td>No</td><td>No (está cifrada)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="mb-2">
+            <strong>Chat:</strong> solo pueden chatear dos personas que se siguen mutuamente y no se han bloqueado. Cada conversación es entre dos personas
+            y únicamente ellas pueden leerla. El indicador “escribiendo...” se muestra en el momento y <strong>no se guarda</strong>.
+            Los mensajes se almacenan en nuestra base de datos <strong>sin cifrado de extremo a extremo</strong>: quien administre técnicamente el servidor
+            o la base de datos podría, en teoría, tener acceso técnico a ellos, pero ASOFOTEC no los consulta, salvo que una autoridad competente
+            lo exija conforme a la ley.
+        </p>
+        <p class="mb-2">
+            <strong>Bloquear:</strong> si bloqueas a alguien, dejan de seguirse, no pueden escribirse y no se muestran entre sí en las sugerencias.
+            No se le avisa a la otra persona.
+        </p>
+        <p class="mb-2">
+            <strong>Enlaces públicos:</strong> las publicaciones y los problemas se pueden abrir con su enlace, incluso por personas
+            que no tienen cuenta. Los perfiles de otros miembros solo los ven personas con sesión iniciada.
+        </p>
+        <p class="mb-2">
+            <strong>Fotos y videos:</strong> los archivos que subes se guardan en nuestro servidor y pueden abrirse con su enlace directo.
+            Cualquier persona que tenga ese enlace podría verlos, así que no subas imágenes o videos que no quieras que otros vean.
+        </p>
+        <p class="mb-0">
+            <strong>El administrador (DBA)</strong> es la única persona con funciones especiales: puede ver la lista de usuarios (nombre, correo,
+            edad, rol, estado y actividad), activar o desactivar cuentas, y eliminar contenido que incumpla las normas.
+            Esas acciones quedan registradas.
+        </p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">4. Con quién compartimos tus datos</h2>
+        <p class="mb-2">
+            No compartimos tus datos personales con empresas de publicidad ni con terceros. Esta plataforma tampoco usa servicios externos
+            de análisis o seguimiento.
+        </p>
+        <p class="mb-2">
+            Si usas el botón <em>Compartir</em> para enviar un enlace por WhatsApp o Facebook, se abre esa aplicación con el enlace que elegiste.
+            ASOFOTEC no les envía tus datos; lo que ocurra después se rige por las políticas de esas plataformas.
+        </p>
+        <p class="mb-0">
+            Solo entregaríamos tus datos si una autoridad competente nos lo exige conforme a la ley.
+        </p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">5. Cookies</h2>
+        <p>Usamos únicamente cookies <strong>necesarias</strong> para que el sitio funcione. No usamos cookies de publicidad ni de análisis.</p>
+        <ul class="mb-0">
+            <li><strong>Jwt</strong>: guarda tu inicio de sesión. Es de tipo HttpOnly (los scripts del navegador no pueden leerla), segura (solo viaja por HTTPS) y dura 2 horas.</li>
+            <li><strong>Sesión</strong> (<code>.AspNetCore.Session</code>): recuerda tu nombre y tu foto mientras navegas. Se borra tras 2 horas sin actividad.</li>
+            <li><strong>Antiforgery</strong> (<code>.AspNetCore.Antiforgery</code>): protege los formularios contra envíos falsificados.</li>
+            <li><strong>Tema claro u oscuro</strong>: la opción que elijas se guarda en el almacenamiento local de tu navegador. No se envía a nuestro servidor.</li>
+        </ul>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">6. Cuánto tiempo guardamos tus datos</h2>
+        <p class="mb-0">
+            Mientras tu cuenta esté activa. Si pides la eliminación de tu cuenta (punto 8), borraremos tus datos personales.
+            Los comentarios, publicaciones y mensajes que hayas hecho podrían eliminarse junto con la cuenta.
+        </p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">7. Seguridad</h2>
+        <ul class="mb-2">
+            <li>Las contraseñas se guardan cifradas.</li>
+            <li>La sesión viaja en una cookie protegida y la conexión debe hacerse por HTTPS.</li>
+            <li>Los archivos que subes se revisan (tipo y tamaño) antes de guardarse.</li>
+            <li>Las cuentas desactivadas pierden el acceso de inmediato.</li>
+            <li>El chat solo funciona con la sesión iniciada, y cada mensaje se entrega únicamente a las dos personas de la conversación.</li>
+        </ul>
+        <p class="mb-0">
+            Aun así, ningún sistema es 100 % seguro. Te recomendamos usar una contraseña única y no compartirla.
+        </p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">8. Tus derechos</h2>
+        <p>
+            Puedes ejercer los derechos de <strong>acceso, rectificación, cancelación (supresión) y oposición</strong> sobre tus datos personales,
+            que reconocen la Constitución de la República Dominicana (art. 44) y la Ley No. 172-13 sobre Protección de Datos de Carácter Personal.
+        </p>
+        <ul>
+            <li><strong>Acceso y rectificación:</strong> puedes ver y corregir tus datos en cualquier momento desde <em>Mi perfil</em>.</li>
+            <li><strong>Eliminación de tu cuenta o de tus datos, y oposición al tratamiento:</strong> escríbenos a
+                <strong><a href="mailto:@correoContacto">@correoContacto</a></strong> desde el correo con el que te registraste. Responderemos en un plazo razonable.</li>
+        </ul>
+        <p class="mb-0 small text-muted">
+            Podemos negarnos a eliminar información cuando una ley nos obligue a conservarla o cuando sea necesaria para proteger derechos de terceros.
+        </p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">9. Menores de edad</h2>
+        <p class="mb-0">
+            ASOFOTEC es para personas de <strong>15 años o más</strong>; el registro lo verifica con tu fecha de nacimiento.
+            Si eres menor de 18 años, te recomendamos usar la plataforma con conocimiento de tu madre, padre o tutor.
+            Si descubrimos que una cuenta pertenece a una persona menor de 15 años, la eliminaremos.
+        </p>
+    </div>
+
+    <div class="as-tarjeta-simple mb-3">
+        <h2 class="h5 as-pagina-titulo">10. Cambios en esta política</h2>
+        <p class="mb-0">
+            Si agregamos funciones que usen otros datos (por ejemplo, notificaciones push, chats en grupo o inicio de sesión con redes sociales),
+            actualizaremos esta política antes de activarlas y cambiaremos la fecha de arriba.
+        </p>
+    </div>
+
+    <div class="as-tarjeta-simple">
+        <h2 class="h5 as-pagina-titulo">11. Contacto</h2>
+        <p class="mb-0">
+            Para cualquier duda sobre esta política o sobre tus datos: <strong><a href="mailto:@correoContacto">@correoContacto</a></strong>.
+        </p>
+    </div>
+</div>

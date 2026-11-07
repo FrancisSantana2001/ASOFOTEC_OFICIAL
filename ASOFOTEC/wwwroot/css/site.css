@@ -9,7 +9,7 @@ html {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem var(--as-superficie), 0 0 0 0.25rem var(--as-verde-texto);
 }
 
 html {
@@ -31,7 +31,7 @@ body {
 }
 
 body {
-    background-color:#f4f6f9;
+    background-color:var(--as-fondo);
 }
 
 .card {
@@ -61,7 +61,7 @@ body {
 }
 
 body {
-    background-color: #f8f9fa;
+    background-color: var(--as-superficie-2);
 }
 
 .card-img-top {
@@ -102,12 +102,12 @@ textarea {
 .form-control-lg {
     border-radius: 0.75rem;
     padding: 0.85rem 1rem;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--as-borde);
 }
 
     .form-control:focus {
         box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
-        border-color: #198754;
+        border-color: var(--as-verde);
     }
 
 .btn {
@@ -116,5 +116,441 @@ textarea {
 }
 
 .text-success {
-    color: #198754 !important;
+    color: var(--as-verde-texto) !important;
+}
+
+/* ===== Soluciones y comentarios ===== */
+
+/* La tarjeta de solución no se "levanta" al pasar el mouse (molesta al escribir) */
+.card-solucion:hover {
+    transform: none;
+}
+
+/* Lista de comentarios con altura máxima: el contenedor ya no crece sin control */
+.lista-comentarios {
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.comentario-avatar {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--as-verde);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comentario-cuerpo {
+    min-width: 0;
+}
+
+.comentario-burbuja {
+    background: var(--as-superficie-2);
+    border-radius: 16px;
+    padding: 6px 12px;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.comentario-texto {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.comentario-menu-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    line-height: 1;
+    border: 0;
+}
+
+/* Caja para escribir: una línea que crece solo hasta 120px */
+.comentario-input {
+    resize: none;
+    max-height: 120px;
+    border-radius: 20px;
+    overflow-y: auto;
+}
+
+.btn-enviar-comentario {
+    flex: 0 0 auto;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+}
+
+
+/* ===== Feed de la página principal ===== */
+
+.card.feed-card:hover {
+    transform: none;
+}
+
+.feed-sticky {
+    position: sticky;
+    top: 76px; /* debajo del navbar fijo */
+}
+
+.feed-avatar,
+.feed-avatar-lg {
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--as-verde);
+    color: #fff;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feed-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+}
+
+.feed-avatar-lg {
+    width: 64px;
+    height: 64px;
+    font-size: 1.4rem;
+}
+
+.feed-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.feed-img {
+    display: block;
+    width: 100%;
+    max-height: 260px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.feed-lateral-item {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.feed-lateral-item:hover .feed-lateral-titulo {
+    color: var(--as-verde-texto);
+}
+
+
+/* ===== Respuestas y likes de comentarios ===== */
+
+.comentario-avatar-sm {
+    width: 26px;
+    height: 26px;
+    font-size: 0.65rem;
+}
+
+/* Las respuestas quedan sangradas bajo el comentario principal */
+.lista-respuestas {
+    margin-left: 40px;
+}
+
+.comentario-accion {
+    font-size: 0.78rem;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+.comentario-acciones {
+    margin-top: 2px;
+}
+
+.form-respuesta .comentario-input {
+    border-radius: 16px;
+}
+
+.form-respuesta .btn-enviar-comentario {
+    width: 32px;
+    height: 32px;
+}
+
+/* ===== Foto / video en publicaciones ===== */
+
+.feed-media {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    border-radius: 10px;
+    background: #000;
+}
+
+.adjunto-preview {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.adjunto-vista {
+    display: block;
+    max-width: 100%;
+    max-height: 180px;
+    border-radius: 10px;
+    background: #000;
+}
+
+.adjunto-quitar {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 2;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    line-height: 1;
+    font-size: 0.7rem;
+    opacity: 0.85;
+}
+
+
+/* ===== Marca y navegación ===== */
+
+.brand-logo {
+    height: 38px;
+    width: auto;
+}
+
+.brand-texto {
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    font-size: 1.15rem;
+    color: #12a89a; /* respaldo si el navegador no soporta texto con degradado */
+    background: linear-gradient(90deg, var(--as-lima), #12a89a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 0.65rem;
+}
+
+/* Barra inferior (móvil y tablet) */
+.bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1030;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--as-superficie);
+    border-top: 1px solid var(--as-borde);
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.7rem;
+    color: var(--as-texto-suave);
+    text-decoration: none;
+    background: none;
+    border: 0;
+}
+
+.bottom-nav-item i {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.bottom-nav-item.activo {
+    color: var(--as-verde-texto);
+    font-weight: 600;
+}
+
+.bottom-nav-boton {
+    width: 100%;
+}
+
+.bottom-nav-crear {
+    flex: 0 0 auto;
+    width: 50px;
+    height: 50px;
+    margin-top: -20px;
+    border-radius: 50%;
+    justify-content: center;
+    background: var(--as-verde);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.45);
+}
+
+.bottom-nav-crear i {
+    font-size: 1.5rem;
+}
+
+
+
+/* Avisos y confirmaciones */
+.ux-toasts {
+    z-index: 1090;
+}
+
+.ux-confirm-icono {
+    font-size: 2.2rem;
+    line-height: 1;
+}
+
+
+/* ===== Ruta del problema (7 pasos) ===== */
+
+.ruta-stepper {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+}
+
+.ruta-paso {
+    flex: 1 0 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 4px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--as-texto-suave);
+    font-size: 0.72rem;
+}
+
+.ruta-paso:hover {
+    background: var(--as-superficie-2);
+}
+
+.ruta-paso.active {
+    background: var(--as-verde-claro);
+    color: var(--as-verde-osc);
+    font-weight: 600;
+}
+
+.ruta-paso-circulo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    background: var(--as-superficie);
+    border: 2px solid var(--as-borde);
+}
+
+.paso-hecho .ruta-paso-circulo {
+    background: var(--as-verde);
+    border-color: var(--as-verde);
+    color: #fff;
+}
+
+.paso-actual .ruta-paso-circulo {
+    border-color: var(--as-verde);
+    color: var(--as-verde-texto);
+    box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.18);
+}
+
+.paso-omitido .ruta-paso-circulo {
+    border-style: dashed;
+    color: var(--as-texto-suave);
+}
+
+.ruta-progreso {
+    height: 6px;
+}
+
+.ruta-panel {
+    background: var(--as-superficie);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    padding: 1rem;
+}
+
+@media (min-width: 768px) {
+    .ruta-panel {
+        padding: 1.5rem;
+    }
+}
+
+.ruta-bloqueado {
+    text-align: center;
+    color: var(--as-texto-suave);
+    padding: 1.5rem 0.5rem;
+}
+
+.ruta-bloqueado i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.tabla-comparar th {
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+/* Línea de tiempo de avances */
+.ruta-linea {
+    border-left: 2px solid var(--as-verde-claro);
+    margin-left: 6px;
+}
+
+.ruta-linea-item {
+    position: relative;
+    padding: 0 0 1rem 1rem;
+}
+
+.ruta-linea-item::before {
+    content: "";
+    position: absolute;
+    left: -7px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--as-verde);
+    border: 2px solid var(--as-superficie);
+}
+
+/* Etiqueta de paso en las tarjetas del feed */
+.ruta-mini {
+    background: var(--as-superficie-2);
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.ruta-mini .progress {
+    height: 5px;
+}
+
+
+/* ===== Iconos de la portada (Bootstrap Icons, en verde) ===== */
+
+.hero-icono {
+    font-size: 2.75rem;
+    line-height: 1;
+    color: var(--as-verde-texto);
 }

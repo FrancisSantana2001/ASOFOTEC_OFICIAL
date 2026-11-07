@@ -1,0 +1,45 @@
+@using ASOFOTEC.Dtos
+@model PanelComentariosVm
+@{
+    var usuarioActualId = Context.ObtenerUsuarioId();
+}
+
+@* Caja de comentarios desplegable. Sirve para soluciones y para publicaciones *@
+<div class="collapse @(Model.Abierto ? "show" : "") mt-3" id="@Model.PanelId">
+    <div class="panel-comentarios">
+
+        @if (usuarioActualId.HasValue)
+        {
+            <form asp-controller="Comentario" asp-action="CrearComentario" method="post"
+                  class="form-comentario d-flex align-items-end gap-2 mb-3">
+                <input type="hidden" name="@Model.Campo" value="@Model.DestinoId" />
+                <textarea name="Contenido"
+                          class="form-control comentario-input"
+                          rows="1"
+                          maxlength="300"
+                          required
+                          placeholder="Escribe un comentario..."></textarea>
+                <button type="submit" class="btn btn-success btn-enviar-comentario" title="Comentar">
+                    <i class="bi bi-send"></i>
+                </button>
+            </form>
+        }
+        else
+        {
+            <p class="text-muted small mb-3">
+                <a asp-controller="Auth" asp-action="Login" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)">Inicia sesión</a> para comentar.
+            </p>
+        }
+
+        <div class="lista-comentarios" id="@Model.ListaId">
+            @foreach (var c in Model.Comentarios)
+            {
+                <partial name="_Comentario" model="c" />
+            }
+        </div>
+
+        <p class="text-muted small mb-0 sin-comentarios @(Model.Comentarios.Any() ? "d-none" : "")">
+            Aún no hay comentarios.
+        </p>
+    </div>
+</div>

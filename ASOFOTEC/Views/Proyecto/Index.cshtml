@@ -1,0 +1,49 @@
+@using ASOFOTEC.Dtos
+@model List<ProblemaDto>
+
+@{
+    ViewData["Title"] = "Proyectos";
+    var enEjecucion = Model.Where(p => p.Etapa < 7).ToList();
+    var resueltos = Model.Where(p => p.Etapa == 7).ToList();
+}
+
+<div class="mt-2">
+    <h1 class="h2 as-pagina-titulo">Proyectos</h1>
+    <p class="text-muted mb-4">
+        Problemas que ya tienen una solución elegida: aquí ves cómo avanza el trabajo y qué resultados se lograron.
+    </p>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-light border">
+            Todavía no hay proyectos. Cuando el creador de un problema elija una solución, aparecerá aquí.
+            <a asp-controller="Problema" asp-action="Index">Explorar problemas</a>
+        </div>
+    }
+
+    @if (enEjecucion.Any())
+    {
+        <h2 class="h5 as-pagina-titulo mb-3">En desarrollo (@enEjecucion.Count)</h2>
+        <div class="row g-3 mb-4">
+            @foreach (var proyecto in enEjecucion)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <partial name="_ProyectoTarjeta" model="proyecto" />
+                </div>
+            }
+        </div>
+    }
+
+    @if (resueltos.Any())
+    {
+        <h2 class="h5 as-pagina-titulo mb-3">Resueltos (@resueltos.Count)</h2>
+        <div class="row g-3">
+            @foreach (var proyecto in resueltos)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <partial name="_ProyectoTarjeta" model="proyecto" />
+                </div>
+            }
+        </div>
+    }
+</div>

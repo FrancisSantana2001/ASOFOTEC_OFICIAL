@@ -1,0 +1,51 @@
+@using ASOFOTEC.Dtos
+@model FeedItemDto
+@{
+    var panelComentarios = new PanelComentariosVm
+    {
+        Campo = "SolucionId",
+        DestinoId = Model.Id,
+        Comentarios = Model.Comentarios
+    };
+}
+
+<article class="card feed-card card-solucion border-0 shadow-sm mb-3">
+    <div class="card-body p-3">
+        <partial name="_FeedCardHeader" model="Model" />
+
+        @if (!string.IsNullOrEmpty(Model.ProblemaTitulo))
+        {
+            <div class="small text-muted mb-1">
+                <i class="bi bi-arrow-return-right"></i>
+                En respuesta a
+                <a asp-controller="Problema" asp-action="Details" asp-route-id="@Model.ProblemaId"
+                   class="text-decoration-none fw-semibold">@Model.ProblemaTitulo</a>
+            </div>
+        }
+
+        <p class="mb-2 feed-text">@Model.Contenido</p>
+
+        <div class="d-flex align-items-center gap-2 pt-2 border-top">
+            <button type="button" class="btn-like btn btn-sm @(Model.UsuarioDioLike ? "btn-success" : "btn-outline-success")"
+                    data-solucion-id="@Model.Id" title="Me gusta" aria-label="Me gusta">
+                <i class="bi @(Model.UsuarioDioLike ? "bi-hand-thumbs-up-fill" : "bi-hand-thumbs-up")"></i>
+                <span class="like-count">@Model.TotalLikes</span>
+            </button>
+
+            <button class="btn btn-sm btn-outline-success btn-toggle-comentarios"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#panel-comentarios-sol-@Model.Id"
+                    aria-expanded="false"
+                    aria-controls="panel-comentarios-sol-@Model.Id"
+                    title="Comentarios">
+                <i class="bi bi-chat"></i>
+                <span class="contador-comentarios">@Model.TotalComentarios</span>
+            </button>
+
+            <span class="badge bg-secondary ms-auto">@Model.Estado</span>
+        </div>
+
+        <partial name="_PanelComentarios" model="panelComentarios" />
+    </div>
+</article>

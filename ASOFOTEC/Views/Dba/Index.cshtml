@@ -1,0 +1,69 @@
+@using ASOFOTEC.Dtos
+@model MetricasDbaDto
+
+@{
+    ViewData["Title"] = "Panel DBA";
+    var totalSexo = Math.Max(1, Model.Masculino + Model.Femenino + Model.SinDato);
+}
+
+<div class="mt-2">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h1 class="h2 as-pagina-titulo mb-0">Panel del administrador</h1>
+            <p class="text-muted mb-0">Métricas generales y gestión de la plataforma.</p>
+        </div>
+        <a asp-action="Usuarios" class="btn btn-as"><i class="bi bi-people me-1"></i>Gestionar usuarios</a>
+    </div>
+
+    <h2 class="h6 text-uppercase text-muted mb-2">Usuarios</h2>
+    <div class="row row-cols-2 row-cols-lg-5 g-3 mb-4">
+        <div class="col"><div class="dba-metrica"><strong>@Model.TotalUsuarios</strong><span>Total</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.UsuariosActivos</strong><span>Activos</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.UsuariosInactivos</strong><span>Desactivados</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.NuevosUltimos7Dias</strong><span>Nuevos en 7 días</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.NuevosUltimos30Dias</strong><span>Nuevos en 30 días</span></div></div>
+    </div>
+
+    <h2 class="h6 text-uppercase text-muted mb-2">Contenido</h2>
+    <div class="row row-cols-2 row-cols-lg-3 g-3 mb-4">
+        <div class="col"><div class="dba-metrica"><strong>@Model.TotalProblemas</strong><span>Problemas</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.TotalSoluciones</strong><span>Soluciones</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.TotalPublicaciones</strong><span>Publicaciones</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.TotalComentarios</strong><span>Comentarios</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.TotalProyectosEnMarcha</strong><span>Proyectos en marcha</span></div></div>
+        <div class="col"><div class="dba-metrica"><strong>@Model.TotalResueltos</strong><span>Problemas resueltos</span></div></div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="as-tarjeta-simple">
+                <h2 class="h6 fw-bold mb-3">Usuarios por sexo</h2>
+                @foreach (var (nombre, cantidad, color) in new[] { ("Masculino", Model.Masculino, "bg-success"), ("Femenino", Model.Femenino, "bg-info"), ("Sin dato", Model.SinDato, "bg-secondary") })
+                {
+                    <div class="d-flex justify-content-between small mb-1"><span>@nombre</span><span>@cantidad</span></div>
+                    <div class="progress mb-3" style="height:8px" role="progressbar" aria-label="@nombre"
+                         aria-valuenow="@cantidad" aria-valuemin="0" aria-valuemax="@totalSexo">
+                        <div class="progress-bar @color" style="width:@(cantidad * 100 / totalSexo)%"></div>
+                    </div>
+                }
+                <p class="small text-muted mb-0">Datos agregados: el panel no muestra el sexo ni la fecha de nacimiento de personas concretas.</p>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="as-tarjeta-simple">
+                <h2 class="h6 fw-bold mb-3">Moderación de contenido</h2>
+                <p class="small mb-2">
+                    Como DBA ves el botón <strong>Eliminar</strong> (menú <i class="bi bi-three-dots"></i>) en cualquier
+                    publicación, problema, solución o comentario, aunque no sea tuyo.
+                </p>
+                <p class="small text-muted mb-2">
+                    Cada eliminación por moderación queda registrada en el registro (log) de la aplicación.
+                </p>
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-lock me-1"></i>Los chats privados no son accesibles desde este panel: solo los ven las dos personas de cada conversación.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

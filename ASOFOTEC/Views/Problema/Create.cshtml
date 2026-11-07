@@ -30,6 +30,25 @@
             <span asp-validation-for="Categoria" class="text-danger"></span>
         </div>
 
+        <div class="border rounded p-3 mb-3 bg-light">
+            <p class="fw-semibold mb-1">Paso 2 de la ruta: causas y consecuencias <span class="text-muted fw-normal">(opcional)</span></p>
+            <p class="text-muted small">Puedes completarlo ahora o después, desde la página del problema.</p>
+
+            <div class="mb-3">
+                <label asp-for="Causas" class="form-label">Causas</label>
+                <textarea asp-for="Causas" class="form-control" rows="3" maxlength="1000"
+                          placeholder="¿Por qué ocurre este problema?"></textarea>
+                <span asp-validation-for="Causas" class="text-danger"></span>
+            </div>
+
+            <div class="mb-0">
+                <label asp-for="Consecuencias" class="form-label">Consecuencias</label>
+                <textarea asp-for="Consecuencias" class="form-control" rows="3" maxlength="1000"
+                          placeholder="¿A quiénes afecta y cómo?"></textarea>
+                <span asp-validation-for="Consecuencias" class="text-danger"></span>
+            </div>
+        </div>
+
         <button type="submit" class="btn btn-success">Publicar Problema</button>
         <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
     </form>

@@ -1,0 +1,36 @@
+@using ASOFOTEC.Dtos
+@model List<ConversacionDto>
+@{
+    var activa = ViewData["Activa"] as int?;
+}
+
+@if (!Model.Any())
+{
+    <div class="text-center text-muted small p-4">
+        <i class="bi bi-chat-dots d-block fs-2 mb-2"></i>
+        Aún no tienes conversaciones.<br />Empieza una con un amigo.
+    </div>
+}
+
+@foreach (var c in Model)
+{
+    var avatar = AvatarVm.De(c.OtroNombre, c.OtroFoto, "feed-avatar");
+
+    <a class="chat-item @(activa == c.Id ? "activa" : "")" asp-controller="Chat" asp-action="Index" asp-route-id="@c.Id">
+        <partial name="_Avatar" model="avatar" />
+
+        <span class="chat-item-cuerpo">
+            <span class="chat-item-linea">
+                <strong class="text-truncate">@c.OtroNombre</strong>
+                <time class="chat-item-hora" data-iso="@c.UltimaFecha.ToString("o")"></time>
+            </span>
+            <span class="chat-item-linea">
+                <span class="chat-item-texto text-truncate @(c.NoLeidos > 0 ? "fw-semibold text-dark" : "")">@(c.UltimoEsMio ? "Tú: " : "")@c.UltimoTexto</span>
+                @if (c.NoLeidos > 0)
+                {
+                    <span class="chat-item-badge">@(c.NoLeidos > 99 ? "99+" : c.NoLeidos.ToString())</span>
+                }
+            </span>
+        </span>
+    </a>
+}
